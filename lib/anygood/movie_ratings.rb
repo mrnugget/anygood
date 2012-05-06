@@ -19,6 +19,7 @@ module AnyGood
       else
         rt_results   = RottenTomatoes::Client.fetch(@moviename)
         imdb_results = IMDB::Client.fetch(@moviename)
+
         @redis.hset "movie_ratings:#{@moviename}", "rottentomatoes", rt_results
         @redis.hset "movie_ratings:#{@moviename}", "imdb", imdb_results
 
