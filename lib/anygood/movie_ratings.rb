@@ -28,20 +28,26 @@ module AnyGood
       rottentomatoes_data["ratings"]
     end
 
-    private 
+    private
 
       def fetch_all_ratings
-        unless @redis.hgetall("movie_ratings:#{@moviename}").empty?
-          @redis.hgetall "movie_ratings:#{@moviename}"
+        key = ratings_key_for(@moviename)
+
+        unless @redis.hgetall(key).empty?
+          @redis.hgetall key
         else
           rt_results   = RottenTomatoes::Client.fetch(@moviename)
           imdb_results = IMDB::Client.fetch(@moviename)
 
-          @redis.hset "movie_ratings:#{@moviename}", "rottentomatoes", rt_results
-          @redis.hset "movie_ratings:#{@moviename}", "imdb", imdb_results
+          @redis.hset key, "rottentomatoes", rt_results
+          @redis.hset key, "imdb", imdb_results
 
-          @redis.hgetall "movie_ratings:#{@moviename}"
+          @redis.hgetall key
         end
+      end
+
+      def ratings_key_for(moviename)
+        "movie_ratings:#{moviename}"
       end
   end
 end
