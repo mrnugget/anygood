@@ -13,7 +13,11 @@ module IMDB
     end
 
     def rating
-      @data['rating'].to_f
+      {
+        score: @data['rating'].to_f,
+        name: 'IMDB',
+        url: @data['imdburl']
+      }
     end
 
     private

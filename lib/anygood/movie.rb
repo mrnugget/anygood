@@ -9,7 +9,8 @@ module AnyGood
     end
 
     def combined_rating
-      @ratings.inject(:+) / @ratings.length
+      scores = @ratings.map {|rating| rating[:score]}
+      scores.inject(:+) / scores.length
     end
 
     def to_json

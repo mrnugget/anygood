@@ -13,10 +13,11 @@ module RottenTomatoes
     end
 
     def rating
-      critics  = @data['ratings']['critics_score'].to_f
-      audience = @data['ratings']['audience_score'].to_f
-
-      ("%.2f" % (((critics + audience) / 2) * 0.1)).to_f
+      {
+        score: combined_score,
+        name: 'Rotten Tomatoes',
+        url: @data['links']['alternate']
+      }
     end
 
     def info
@@ -31,6 +32,13 @@ module RottenTomatoes
       def fetch_data
         results = JSON.parse get(@moviename)
         results['movies'].first || nil
+      end
+
+      def combined_score
+        critics  = @data['ratings']['critics_score'].to_f
+        audience = @data['ratings']['audience_score'].to_f
+
+        ("%.2f" % (((critics + audience) / 2) * 0.1)).to_f
       end
 
       def get(moviename)
