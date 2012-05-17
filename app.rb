@@ -19,6 +19,8 @@ module AnyGood
     end
 
     get '/api/movies/:moviename' do
+      content_type :json
+
       movie = MovieFetcher.fetch_by_name(params[:moviename])
       movie.to_json
     end
