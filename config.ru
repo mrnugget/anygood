@@ -1,2 +1,2 @@
 require './app'
-run RatingsApp
+run AnyGood::App

@@ -1,4 +1,4 @@
-require './lib/anygood/movie_ratings'
+require './lib/anygood/movie'
 require './lib/imdb/client'
 require './lib/rottentomatoes/client'
 

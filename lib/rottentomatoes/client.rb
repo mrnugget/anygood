@@ -4,15 +4,27 @@ require 'open-uri'
 module RottenTomatoes
   class Client
     def self.fetch(moviename)
-      new.fetch(moviename)
+      new(moviename)
     end
 
-    def fetch(moviename)
-      results = JSON.parse get(moviename)
-      results['movies'].first || nil
+    def initialize(moviename)
+      @moviename = moviename
+      @data      = fetch_data
+    end
+
+    def rating
+      critics  = @data['ratings']['critics_score'].to_f
+      audience = @data['ratings']['audience_score'].to_f
+
+      ("%.2f" % (((critics + audience) / 2) * 0.1)).to_f
     end
 
     private
+
+      def fetch_data
+        results = JSON.parse get(@moviename)
+        results['movies'].first || nil
+      end
 
       def get(moviename)
         api_key = 'art7wzby22d4vmxfs9zw4qjh'
