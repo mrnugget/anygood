@@ -19,6 +19,13 @@ module RottenTomatoes
       ("%.2f" % (((critics + audience) / 2) * 0.1)).to_f
     end
 
+    def info
+      {
+        'poster' => @data['posters']['detailed'],
+        'year'   => @data['year']
+      }
+    end
+
     private
 
       def fetch_data
