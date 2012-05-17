@@ -1,9 +1,17 @@
 require './lib/anygood/movie'
+require './lib/anygood/movie_fetcher'
 require './lib/imdb/client'
 require './lib/rottentomatoes/client'
+require 'redis'
+
+# Make REDIS available for the unit tests
+module AnyGood
+  REDIS = Redis.new
+end
 
 # Monkey-patching the class, so it doesn't hit the network
 # and loads the manually downloaded .json file
+
 module IMDB
   class Client
     private

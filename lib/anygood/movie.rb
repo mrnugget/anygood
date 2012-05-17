@@ -14,9 +14,10 @@ module AnyGood
 
     def to_json
       {
-        name: @name,
+        name: @name.sub(/\+/, ' '),
         info: @info,
-        ratings: @ratings
+        ratings: @ratings,
+        combined_rating: combined_rating
       }.to_json
     end
   end

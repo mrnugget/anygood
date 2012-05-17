@@ -2,13 +2,25 @@ require 'rubygems'
 require 'sinatra'
 require 'redis'
 require 'json'
+require './lib/anygood/movie_fetcher'
+require './lib/anygood/movie'
+require './lib/imdb/client'
+require './lib/rottentomatoes/client'
 
-class AnyGood::App < Sinatra::Base
-  get '/' do
-    erb :index
-  end
+module AnyGood
+  class App < Sinatra::Base
 
-  get '/api/movies/:moviename' do
-    # Get movie and to json
+    configure do
+      AnyGood::REDIS = Redis.new
+    end
+
+    get '/' do
+      erb :index
+    end
+
+    get '/api/movies/:moviename' do
+      movie = MovieFetcher.fetch_by_name(params[:moviename])
+      movie.to_json
+    end
   end
 end
