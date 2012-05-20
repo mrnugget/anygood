@@ -6,6 +6,8 @@ GEM
     rack (1.4.1)
     rack-protection (1.2.0)
       rack
+    rack-test (0.6.1)
+      rack (>= 1.0)
     redis (2.2.2)
     rspec (2.10.0)
       rspec-core (~> 2.10.0)
@@ -26,6 +28,7 @@ PLATFORMS
 
 DEPENDENCIES
   json
+  rack-test
   redis
   rspec
   sinatra

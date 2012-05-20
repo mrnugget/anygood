@@ -1,11 +1,8 @@
+Dir[File.dirname(__FILE__) + '/lib/**/*.rb'].each {|file| require file }
 require 'rubygems'
 require 'sinatra'
 require 'redis'
 require 'json'
-require './lib/anygood/movie_fetcher'
-require './lib/anygood/movie'
-require './lib/imdb/client'
-require './lib/rottentomatoes/client'
 
 module AnyGood
   class App < Sinatra::Base

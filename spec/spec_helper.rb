@@ -1,18 +1,16 @@
-require './lib/anygood/movie'
-require './lib/anygood/movie_fetcher'
-require './lib/imdb/client'
-require './lib/rottentomatoes/client'
-require 'redis'
+require './app'
+require 'rack/test'
 
-# Make REDIS available for the unit tests
-module AnyGood
-  REDIS = Redis.new
+def app
+  @app ||= AnyGood::App
 end
-RSpec.configure do |config|
-  config.before(:each) do
-    # Monkey-patching the class, so it doesn't hit the network
-    # and loads the manually downloaded .json file
 
+RSpec.configure do |config|
+  config.include Rack::Test::Methods
+  config.before(:each) do
+
+    # Monkey-patching the clients, so they don't hit the network
+    # and load the manually downloaded .json file
     module IMDB
       class Client
         private
