@@ -7,6 +7,10 @@ module RottenTomatoes
       new(moviename)
     end
 
+    def self.name
+      'Rotten Tomatoes'
+    end
+
     def initialize(moviename)
       @moviename = moviename
       @data      = fetch_data
@@ -15,15 +19,14 @@ module RottenTomatoes
     def rating
       {
         score: combined_score,
-        name: 'Rotten Tomatoes',
         url: @data['links']['alternate']
       }
     end
 
     def info
       {
-        'poster' => @data['posters']['detailed'],
-        'year'   => @data['year']
+        poster:  @data['posters']['detailed'],
+        year:    @data['year']
       }
     end
 

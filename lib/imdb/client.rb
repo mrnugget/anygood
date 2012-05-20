@@ -7,6 +7,10 @@ module IMDB
       new(moviename)
     end
 
+    def self.name
+      'IMDB'
+    end
+
     def initialize(moviename)
       @moviename = moviename
       @data      = fetch_data
@@ -15,7 +19,6 @@ module IMDB
     def rating
       {
         score: @data['rating'].to_f,
-        name: 'IMDB',
         url: @data['imdburl']
       }
     end

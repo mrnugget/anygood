@@ -9,7 +9,7 @@ module AnyGood
     end
 
     def combined_rating
-      scores = @ratings.map {|rating| rating[:score]}
+      scores = @ratings.map {|key, value| value[:score]}
       scores.inject(:+) / scores.length
     end
 
