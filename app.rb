@@ -1,9 +1,3 @@
-Dir[File.dirname(__FILE__) + '/lib/**/*.rb'].each {|file| require file }
-require 'rubygems'
-require 'sinatra'
-require 'redis'
-require 'json'
-
 module AnyGood
   class App < Sinatra::Base
 

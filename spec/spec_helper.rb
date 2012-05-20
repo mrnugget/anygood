@@ -1,5 +1,5 @@
-require './app'
-require 'rack/test'
+ENV['RACK_ENV'] = "test"
+require File.expand_path(File.dirname(__FILE__) + "/../config/boot")
 
 def app
   @app ||= AnyGood::App
