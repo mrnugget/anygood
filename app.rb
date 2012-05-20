@@ -13,7 +13,7 @@ module AnyGood
       content_type :json
 
       movie = MovieFetcher.fetch_by_name(params[:moviename])
-      movie.to_json
+      movie.as_json
     end
   end
 end

@@ -13,13 +13,13 @@ module AnyGood
       scores.inject(:+) / scores.length
     end
 
-    def to_json
-      {
+    def as_json(options={})
+      JSON.pretty_generate({
         name: @name.sub(/\+/, ' '),
         info: @info,
         ratings: @ratings,
         combined_rating: combined_rating
-      }.to_json
+      })
     end
   end
 end
