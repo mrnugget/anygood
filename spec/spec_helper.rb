@@ -1,6 +1,9 @@
 ENV['RACK_ENV'] = "test"
 require File.expand_path(File.dirname(__FILE__) + "/../config/boot")
 
+# custom macros in spec/support/ and subdirs
+# Dir[Rails.root.join('spec/support/**/*.rb')].each {|f| require f}
+
 def app
   @app ||= AnyGood::App
 end
