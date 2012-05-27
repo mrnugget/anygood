@@ -11,15 +11,7 @@ describe 'API' do
   end
 
   it 'does not fail if one clients has a parse error' do
-    # Monkey-patching this, to produce errors.
-    module IMDB
-      class Client
-        private
-        def get(moviename)
-          File.read('./spec/fixtures/json_parse_error.json')
-        end
-      end
-    end
+    mock_response_for(IMDB::Client, 'json_parse_error.json')
 
     get '/api/movies/Inception'
 
