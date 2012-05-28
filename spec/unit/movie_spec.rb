@@ -19,7 +19,7 @@ describe AnyGood::Movie do
       'IMDB' => {score: 8.8, url: 'http://www.imdb.com/title/tt1375666/'},
       'Rotten Tomatoes' => {score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
     }
-    info = RottenTomatoes::Client.fetch('Inception').info
+    info = RottenTomatoes::Client.fetch('Inception', 2010).info
 
     movie = AnyGood::Movie.new(
       name: 'Inception',

@@ -3,16 +3,17 @@ require 'open-uri'
 
 module RottenTomatoes
   class Client
-    def self.fetch(moviename)
-      new(moviename)
+    def self.fetch(moviename, year)
+      new(moviename, year)
     end
 
     def self.name
       'Rotten Tomatoes'
     end
 
-    def initialize(moviename)
+    def initialize(moviename, year)
       @moviename = moviename
+      @year      = year
       @data      = fetch_data
     end
 
@@ -26,15 +27,18 @@ module RottenTomatoes
     def info
       {
         poster:  @data['posters']['detailed'],
-        year:    @data['year']
+        year:    @year
       }
     end
 
     private
 
       def fetch_data
-        results = JSON.parse get(@moviename)
-        results['movies'].first || nil
+        results = JSON.parse(query_api)
+        matching_movies = results['movies'].select do |movie|
+          movie['year'] == @year
+        end
+        matching_movies.first || nil
       end
 
       def combined_score
@@ -44,9 +48,9 @@ module RottenTomatoes
         ("%.2f" % (((critics + audience) / 2) * 0.1)).to_f
       end
 
-      def get(moviename)
+      def query_api
         api_key = 'art7wzby22d4vmxfs9zw4qjh'
-        open("http://api.rottentomatoes.com/api/public/v1.0/movies.json?apikey=#{api_key}&q=#{moviename}&page_limit=1").read
+        open("http://api.rottentomatoes.com/api/public/v1.0/movies.json?apikey=#{api_key}&q=#{@moviename}").read
       end
   end
 end

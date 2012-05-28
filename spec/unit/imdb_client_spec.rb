@@ -7,7 +7,7 @@ describe IMDB::Client do
 
   describe 'fetching a movie rating' do
     before(:each) do
-      @rating = IMDB::Client.fetch('Inception').rating
+      @rating = IMDB::Client.fetch('Inception', 2010).rating
     end
 
     it 'fetches the rating for a movie' do
@@ -15,7 +15,7 @@ describe IMDB::Client do
     end
 
     it 'includes the URL of the ratings page' do
-      @rating[:url].should == 'http://www.imdb.com/title/tt1375666/'
+      @rating[:url].should == 'http://www.imdb.com/title/tt1375666'
     end
   end
 end
