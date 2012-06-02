@@ -20,6 +20,11 @@ rackup -p 4567
 
 And now open `http://localhost:4567` in your browser.
 
+## Look up a movie's ratings
+
+When you visit the site type in the name of the movie and the year it was
+released and the ratings should show up.
+
 ## API
 
 The current API resides at `/api/movies`. So, let's say you want to check the
@@ -59,4 +64,6 @@ The response is JSON and should look like this:
   implemented.
 - I want to use Redis to cache the API results for a couple of hours, so looking
   up movies doesn't require hitting the external APIs all the time.
-- And I guess a frontend wouldn't be too bad, now would it?
+- Add the following clients:
+  - http://www.themoviedb.org
+  - http://www.moviepilot.com
