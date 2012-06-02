@@ -1,5 +1,5 @@
 require 'json'
-require 'open-uri'
+require 'net/http'
 
 module IMDB
   class Client
@@ -31,7 +31,11 @@ module IMDB
       end
 
       def query_api
-        open("http://www.imdbapi.com/?t=#{@moviename}&y=#{@year}").read
+        uri = URI(
+          URI.encode("http://www.imdbapi.com/?t=#{@moviename}&y=#{@year}")
+        )
+        response = Net::HTTP.get_response(uri)
+        response.body
       end
   end
 end

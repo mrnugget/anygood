@@ -1,5 +1,6 @@
 require 'json'
 require 'open-uri'
+require 'net/http'
 
 module RottenTomatoes
   class Client
@@ -50,7 +51,12 @@ module RottenTomatoes
 
       def query_api
         api_key = 'art7wzby22d4vmxfs9zw4qjh'
-        open("http://api.rottentomatoes.com/api/public/v1.0/movies.json?apikey=#{api_key}&q=#{@moviename}").read
+        uri     = URI(
+          URI.encode("http://api.rottentomatoes.com/api/public/v1.0/movies.json?apikey=#{api_key}&q=#{@moviename}")
+        )
+
+        response = Net::HTTP.get_response(uri)
+        response.body
       end
   end
 end
