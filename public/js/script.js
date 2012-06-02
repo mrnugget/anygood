@@ -9,17 +9,14 @@ $(function () {
     $.get(apiUrl, function(movie){
       var movie_html = "";
 
-      movie_html += "<h3>" + movie.name + "(" + movie.info.year + ")</h3>";
+      movie_html += "<h3>" + movie.name + " (" + movie.info.year + ")</h3>";
       movie_html += '<img src="' + movie.info.poster + '">';
       movie_html += "<h4>Combined Rating: " + movie.combined_rating + "</h4>";
 
       var movie_ratings = "<h4>Ratings: </h4>";
       $.each(movie.ratings, function(rating_site, rating) {
-        movie_ratings += "<h4>" + rating_site + ":</h4>";
-        $.each(rating, function(key, value) {
-          movie_ratings += "<p>";
-          movie_ratings += "<b>" + key + "</b>: " + value;
-        });
+        movie_ratings += '<h4><a href="' + rating.url + '">';
+        movie_ratings += rating_site + '</a>:</h4> ' + rating.score;
       });
       movie_html += movie_ratings;
 
