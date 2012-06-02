@@ -8,6 +8,17 @@
 <body>
   <h1>Any good?</h1>
   <h2>Check if a movie is any good!</h2>
+  <form action="/api/movies" id="search_movie">
+    <label for="movie_name_input">Name:</label>
+    <input id="movie_name_input" type="text" name="movie_name_input">
+    <label for="movie_year_input">Year:</label>
+    <input id="movie_year_input" type="text" name="movie_year_input">
+    <input type="submit" value="Search">
+  </form>
+
+  <div id="result">
+
+  </div>
 
   <script src="js/libs/jquery-1.7.2.js" type="text/javascript" charset="utf-8"></script>
   <script src="js/script.js" type="text/javascript" charset="utf-8"></script>
