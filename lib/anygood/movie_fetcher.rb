@@ -6,44 +6,71 @@ module AnyGood
     end
 
     def fetch_by_name_and_year(moviename, year)
-      ratings = fetch_ratings_from_clients_or_cache(moviename, year)
-      info    = fetch_info_from_rottentomatoes_or_cache(moviename, year)
+      ratings = ratings_from_cache_or_clients(moviename, year)
+      info    = info_from_cache_or_client(::RottenTomatoes::Client, moviename, year)
 
-      Movie.new(
-        name: moviename.gsub('%20', ' '),
-        ratings: ratings,
-        info: info
-      )
+      Movie.new(name: moviename, ratings: ratings, info: info)
     end
 
     private
-
-      def fetch_ratings_from_clients_or_cache(moviename, year)
-        fetched_ratings = {}
-
-        clients.each do |klass|
-          begin
-            rating = klass.fetch(moviename, year).rating
-          rescue JSON::ParserError
-            rating = {error: 'Could not be parsed'}
-          end
-          fetched_ratings[klass.name] = rating
-        end
-
-        fetched_ratings
-      end
-
-      def fetch_info_from_rottentomatoes_or_cache(moviename, year)
-        ::RottenTomatoes::Client.fetch(moviename, year).info
-      rescue JSON::ParserError
-        {error: 'Could not be parsed'}
-      end
 
       def clients
         [
           ::IMDB::Client,
           ::RottenTomatoes::Client,
         ]
+      end
+
+      def info_from_cache_or_client(client, moviename, year)
+        cached_info = REDIS.get(info_key_for(moviename, client.name))
+
+        unless cached_info
+          begin
+            fetch_and_save_to_cache(:info, ::RottenTomatoes::Client, moviename, year)
+          rescue JSON::ParserError
+            {error: 'Could not be parsed'}
+          end
+        else
+          JSON.parse(cached_info, symbolize_names: true)
+        end
+      end
+
+      def ratings_from_cache_or_clients(moviename, year)
+        ratings = {}
+
+        clients.each do |client|
+          cached_rating = REDIS.get(rating_key_for(moviename, client.name))
+
+          unless cached_rating
+            ratings[client.name] = begin
+              fetch_and_save_to_cache(:rating, client, moviename, year)
+            rescue JSON::ParserError
+              {error: 'Could not be parsed'}
+            end
+          else
+            ratings[client.name] = JSON.parse(cached_rating, symbolize_names: true)
+          end
+        end
+
+        ratings
+      end
+
+      def fetch_and_save_to_cache(type, client, moviename, year)
+        result = client.fetch(moviename, year).send(type)
+        REDIS.setex(
+          send("#{type.to_s}_key_for", moviename, client.name),
+          14400,
+          result.to_json
+        )
+        result
+      end
+
+      def info_key_for(moviename, client_name)
+        "movieinfo:#{URI.encode(moviename)}:#{URI.encode(client_name)}"
+      end
+
+      def rating_key_for(moviename, client_name)
+        "movierating:#{URI.encode(moviename)}:#{URI.encode(client_name)}"
       end
   end
 end

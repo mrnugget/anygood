@@ -10,4 +10,7 @@ end
 
 RSpec.configure do |config|
   config.include Rack::Test::Methods
+  config.before(:each) do
+    AnyGood::REDIS.flushall
+  end
 end
