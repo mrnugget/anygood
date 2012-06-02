@@ -2,7 +2,12 @@ module AnyGood
   class App < Sinatra::Base
 
     configure do
-      AnyGood::REDIS = Redis.new
+      if ENV["REDISTOGO_URL"]
+        uri = URI.parse(ENV["REDISTOGO_URL"])
+        AnyGood::REDIS = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
+      else
+        AnyGood::REDIS = Redis.new
+      end
     end
 
     get '/' do
