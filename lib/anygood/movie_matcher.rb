@@ -15,7 +15,7 @@ module AnyGood
       intersection_key = index_key_for(prefixes)
       index_keys       = prefixes.map {|prefix| index_key_for(prefix)}
 
-      REDIS.pipelined do
+      REDIS.multi do
         REDIS.zinterstore(intersection_key, index_keys)
         REDIS.expire(intersection_key, 7200)
       end
