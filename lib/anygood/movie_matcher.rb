@@ -7,16 +7,18 @@ module AnyGood
       new.add_movie(movie_hash)
     end
 
-    def self.find_by_prefixes(partials)
-      new.find_by_prefixes(partials)
+    def self.find_by_prefixes(prefixes)
+      new.find_by_prefixes(prefixes)
     end
 
-    def find_by_prefixes(partials)
-      intersection_key   = index_key_for(partials)
-      partial_index_keys = partials.map {|partial| index_key_for(partial)}
+    def find_by_prefixes(prefixes)
+      intersection_key = index_key_for(prefixes)
+      index_keys       = prefixes.map {|prefix| index_key_for(prefix)}
 
-      REDIS.zinterstore(intersection_key, partial_index_keys)
-      REDIS.expire(intersection_key, 7200)
+      REDIS.pipelined do
+        REDIS.zinterstore(intersection_key, index_keys)
+        REDIS.expire(intersection_key, 7200)
+      end
 
       data_hash_keys  = REDIS.zrange(intersection_key, 0, -1)
       matching_movies = REDIS.hmget(data_key, *data_hash_keys)
