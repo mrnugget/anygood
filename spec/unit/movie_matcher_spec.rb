@@ -10,11 +10,14 @@ describe AnyGood::MovieMatcher do
   end
 
   let(:md5_hash_name) do
-    Digest::MD5.hexdigest(movie_hash[:name])
+    Digest::MD5.hexdigest(movie_hash[:name] + movie_hash[:year].to_s)
+  end
+
+  let(:movie_matcher) do
+    AnyGood::MovieMatcher.new
   end
 
   describe '.add_movie' do
-
     it 'saves the movie hash as JSON to a redis hash' do
       AnyGood::REDIS.should_receive(:hset).with(
         'moviesearch:data',
@@ -22,53 +25,86 @@ describe AnyGood::MovieMatcher do
         movie_hash.to_json
       )
 
-      AnyGood::MovieMatcher.add_movie(movie_hash)
+      movie_matcher.add_movie(movie_hash)
     end
 
     it 'saves the prefixes of the words in the movie name as sorted sets' do
-      AnyGood::REDIS.should_receive(:zadd).with('moviesearch:index:th',0,md5_hash_name)
-      AnyGood::REDIS.should_receive(:zadd).with('moviesearch:index:the',0,md5_hash_name)
-      AnyGood::REDIS.should_receive(:zadd).with('moviesearch:index:da',0,md5_hash_name)
-      AnyGood::REDIS.should_receive(:zadd).with('moviesearch:index:dar',0,md5_hash_name)
-      AnyGood::REDIS.should_receive(:zadd).with('moviesearch:index:dark',0,md5_hash_name)
-      AnyGood::REDIS.should_receive(:zadd).with('moviesearch:index:kn',0,md5_hash_name)
-      AnyGood::REDIS.should_receive(:zadd).with('moviesearch:index:kni',0,md5_hash_name)
-      AnyGood::REDIS.should_receive(:zadd).with('moviesearch:index:knig',0,md5_hash_name)
-      AnyGood::REDIS.should_receive(:zadd).with('moviesearch:index:knigh',0,md5_hash_name)
-      AnyGood::REDIS.should_receive(:zadd).with('moviesearch:index:knight',0,md5_hash_name)
+      %w(th the da dar dark kn kni knig knigh knight).each do |prefix|
+        AnyGood::REDIS.should_receive(:zadd).with("moviesearch:index:#{prefix}",0,md5_hash_name)
+      end
 
-      AnyGood::MovieMatcher.add_movie(movie_hash)
+      movie_matcher.add_movie(movie_hash)
     end
   end
 
   describe '.find_by_prefixes' do
     it 'returns the right movie when passed a matching prefix' do
-      AnyGood::MovieMatcher.add_movie(movie_hash)
+      movie_matcher.add_movie(movie_hash)
 
-      AnyGood::MovieMatcher.find_by_prefixes(['dark']).should include(movie_hash)
-      AnyGood::MovieMatcher.find_by_prefixes(['kni']).should include(movie_hash)
+      movie_matcher.find_by_prefixes(['dark']).should include(movie_hash)
+      movie_matcher.find_by_prefixes(['kni']).should include(movie_hash)
     end
 
     it 'returns the right movie when passed matching prefixes' do
-      AnyGood::MovieMatcher.add_movie(movie_hash)
+      movie_matcher.add_movie(movie_hash)
 
-      matches = AnyGood::MovieMatcher.find_by_prefixes(['da', 'knight'])
+      matches = movie_matcher.find_by_prefixes(['da', 'knight'])
       matches.should include(movie_hash)
     end
 
-    it 'returns all movies when passed prefixes occur in both' do
+    it 'returns all movies when passed prefixes occuring in both' do
       dark_knight_rises = movie_hash.merge(name: 'The Dark Knight Rises')
       inception         = movie_hash.merge(name: 'Inception')
 
-      AnyGood::MovieMatcher.add_movie(movie_hash)
-      AnyGood::MovieMatcher.add_movie(dark_knight_rises)
-      AnyGood::MovieMatcher.add_movie(inception)
+      movie_matcher.add_movie(movie_hash)
+      movie_matcher.add_movie(dark_knight_rises)
+      movie_matcher.add_movie(inception)
 
-      matches = AnyGood::MovieMatcher.find_by_prefixes(['da', 'knight'])
+      matches = movie_matcher.find_by_prefixes(['da', 'knight'])
 
       matches.should have(2).items
       matches.should include(movie_hash, dark_knight_rises)
+    end
+
+    it 'does not return movies when passed prefixes dont occur in their names' do
+      dark_knight_rises = movie_hash.merge(name: 'The Dark Knight Rises')
+      inception         = movie_hash.merge(name: 'Inception')
+
+      movie_matcher.add_movie(movie_hash)
+      movie_matcher.add_movie(dark_knight_rises)
+      movie_matcher.add_movie(inception)
+
+      matches = movie_matcher.find_by_prefixes(['da', 'knight'])
+
       matches.should_not include(inception)
+    end
+
+    it 'works case-insensitive when passes prefixes' do
+      movie_matcher.add_movie(movie_hash)
+
+      matches = movie_matcher.find_by_prefixes(['Da', 'Knight'])
+      matches.should include(movie_hash)
+    end
+  end
+
+  describe '.incr_score_for' do
+    it 'increments the score of the movies data hash key in the prefix sets' do
+      %w(th the da dar dark kn kni knig knigh knight).each do |prefix|
+        AnyGood::REDIS.should_receive(:zincrby).with("moviesearch:index:#{prefix}",1,md5_hash_name)
+      end
+
+      movie_matcher.incr_score_for(movie_hash)
+    end
+  end
+
+  describe 'sorting match results by score' do
+    it 'sorts the match results after the score of the movies' do
+      movie_matcher.add_movie(movie_hash)
+      movie_matcher.add_movie(movie_hash.merge(name: 'The Green Mile'))
+
+      movie_matcher.incr_score_for(movie_hash)
+          
+      movie_matcher.find_by_prefixes(['the']).first.should == movie_hash
     end
   end
 end
