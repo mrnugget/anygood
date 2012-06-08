@@ -62,8 +62,6 @@ The response is JSON and should look like this:
 - Better error handling in the API clients: currently the only thing that is
   working is JSON Parser Errors. Handling of 404, 500, 503 and whatnot should be
   implemented.
-- I want to use Redis to cache the API results for a couple of hours, so looking
-  up movies doesn't require hitting the external APIs all the time.
 - Add the following clients:
   - http://www.themoviedb.org
   - http://www.moviepilot.com
