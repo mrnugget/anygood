@@ -7,8 +7,9 @@ module AnyGood
       prefixes    = prefixes_for(movie_hash[:name])
       hashed_name = data_hash_key_for(movie_hash)
 
-      REDIS.multi do
-        prefixes.each {|prefix| REDIS.zadd(index_key_for(prefix), 0, hashed_name)}
+      prefixes.each do |prefix|
+        score = REDIS.zscore(index_key_for(prefix), hashed_name).to_i || 0
+        REDIS.zadd(index_key_for(prefix), score, hashed_name)
       end
 
       REDIS.hset(data_key, hashed_name, movie_hash.to_json)

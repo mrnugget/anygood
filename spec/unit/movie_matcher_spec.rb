@@ -35,6 +35,17 @@ describe AnyGood::MovieMatcher do
 
       movie_matcher.add_movie(movie_hash)
     end
+
+    it 'does not reset to the score of a movie to 0 when trying to add it again' do
+      movie_matcher.add_movie(movie_hash)
+      movie_matcher.incr_score_for(movie_hash)
+
+      %w(th the da dar dark kn kni knig knigh knight).each do |prefix|
+        AnyGood::REDIS.should_receive(:zadd).with("moviesearch:index:#{prefix}",1,md5_hash_name)
+      end
+
+      movie_matcher.add_movie(movie_hash)
+    end
   end
 
   describe '.find_by_prefixes' do
@@ -45,7 +56,7 @@ describe AnyGood::MovieMatcher do
       movie_matcher.find_by_prefixes(['kni']).should include(movie_hash)
     end
 
-    it 'returns the right movie when passed matching prefixes' do
+    it 'returns the right movie when passed more than one matching prefixe' do
       movie_matcher.add_movie(movie_hash)
 
       matches = movie_matcher.find_by_prefixes(['da', 'knight'])
@@ -85,6 +96,15 @@ describe AnyGood::MovieMatcher do
       matches = movie_matcher.find_by_prefixes(['Da', 'Knight'])
       matches.should include(movie_hash)
     end
+
+    it 'sorts the match results after the score of the movies' do
+      movie_matcher.add_movie(movie_hash)
+      movie_matcher.add_movie(movie_hash.merge(name: 'The Green Mile'))
+
+      movie_matcher.incr_score_for(movie_hash)
+
+      movie_matcher.find_by_prefixes(['the']).first.should == movie_hash
+    end
   end
 
   describe '.incr_score_for' do
@@ -94,17 +114,6 @@ describe AnyGood::MovieMatcher do
       end
 
       movie_matcher.incr_score_for(movie_hash)
-    end
-  end
-
-  describe 'sorting match results by score' do
-    it 'sorts the match results after the score of the movies' do
-      movie_matcher.add_movie(movie_hash)
-      movie_matcher.add_movie(movie_hash.merge(name: 'The Green Mile'))
-
-      movie_matcher.incr_score_for(movie_hash)
-          
-      movie_matcher.find_by_prefixes(['the']).first.should == movie_hash
     end
   end
 end
