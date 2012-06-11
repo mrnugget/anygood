@@ -48,19 +48,56 @@ describe AnyGood::MovieMatcher do
     end
   end
 
+  describe AnyGood::MovieMatcher::Result do
+
+    let(:matching_movies) do
+      [movie_hash, movie_hash.merge(name: 'The Dark Knight Rises')]
+    end
+
+    describe 'initialize' do
+      it 'sets the right attributes' do
+        result = AnyGood::MovieMatcher::Result.new('The Dark', matching_movies)
+
+        result.search_term.should == 'The Dark'
+        result.movies.should == matching_movies
+        result.count.should == 2
+      end
+    end
+
+    describe '#to_json' do
+      it 'represents the result as JSON' do
+        result = AnyGood::MovieMatcher::Result.new('The Dark', matching_movies)
+
+        json_result   = result.to_json
+
+        parsed_result = JSON.parse(json_result)
+        parsed_result['search_term'].should == 'The Dark'
+        parsed_result['movies'].should include({'name' => 'The Dark Knight', 'year' => 2008})
+      end
+    end
+  end
+
   describe '.find_by_prefixes' do
+    it 'returns a MovieMatcher::Result object' do
+      movie_matcher.add_movie(movie_hash)
+
+      result = movie_matcher.find_by_prefixes(['dark'])
+      result.should be_a(AnyGood::MovieMatcher::Result)
+    end
+
     it 'returns the right movie when passed a matching prefix' do
       movie_matcher.add_movie(movie_hash)
 
-      movie_matcher.find_by_prefixes(['dark']).should include(movie_hash)
-      movie_matcher.find_by_prefixes(['kni']).should include(movie_hash)
+      result = movie_matcher.find_by_prefixes(['dark'])
+
+      result.movies.should include(movie_hash)
     end
 
     it 'returns the right movie when passed more than one matching prefixe' do
       movie_matcher.add_movie(movie_hash)
 
-      matches = movie_matcher.find_by_prefixes(['da', 'knight'])
-      matches.should include(movie_hash)
+      result = movie_matcher.find_by_prefixes(['da', 'knight'])
+      result.movies.should include(movie_hash)
     end
 
     it 'returns all movies when passed prefixes occuring in both' do
@@ -71,10 +108,10 @@ describe AnyGood::MovieMatcher do
       movie_matcher.add_movie(dark_knight_rises)
       movie_matcher.add_movie(inception)
 
-      matches = movie_matcher.find_by_prefixes(['da', 'knight'])
+      result = movie_matcher.find_by_prefixes(['da', 'knight'])
 
-      matches.should have(2).items
-      matches.should include(movie_hash, dark_knight_rises)
+      result.count.should == 2
+      result.movies.should include(movie_hash, dark_knight_rises)
     end
 
     it 'does not return movies when passed prefixes dont occur in their names' do
@@ -85,16 +122,16 @@ describe AnyGood::MovieMatcher do
       movie_matcher.add_movie(dark_knight_rises)
       movie_matcher.add_movie(inception)
 
-      matches = movie_matcher.find_by_prefixes(['da', 'knight'])
+      result = movie_matcher.find_by_prefixes(['da', 'knight'])
 
-      matches.should_not include(inception)
+      result.movies.should_not include(inception)
     end
 
     it 'works case-insensitive when passes prefixes' do
       movie_matcher.add_movie(movie_hash)
 
-      matches = movie_matcher.find_by_prefixes(['Da', 'Knight'])
-      matches.should include(movie_hash)
+      result = movie_matcher.find_by_prefixes(['Da', 'Knight'])
+      result.movies.should include(movie_hash)
     end
 
     it 'sorts the match results after the score of the movies' do
@@ -103,7 +140,8 @@ describe AnyGood::MovieMatcher do
 
       movie_matcher.incr_score_for(movie_hash)
 
-      movie_matcher.find_by_prefixes(['the']).first.should == movie_hash
+      result = movie_matcher.find_by_prefixes(['the'])
+      result.movies.first.should == movie_hash
     end
   end
 

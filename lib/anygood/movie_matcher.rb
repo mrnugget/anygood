@@ -2,6 +2,22 @@ require 'digest'
 
 module AnyGood
   class MovieMatcher
+    class Result
+      attr_reader :count, :search_term, :movies
+
+      def initialize(search_term, movies)
+        @search_term = search_term
+        @movies      = movies
+        @count       = movies.length
+      end
+
+      def to_json
+        {
+          search_term: @search_term,
+          movies: @movies
+        }.to_json
+      end
+    end
 
     def add_movie(movie_hash)
       prefixes    = prefixes_for(movie_hash[:name])
@@ -27,7 +43,9 @@ module AnyGood
       data_hash_keys  = REDIS.zrevrange(intersection_key, 0, -1)
       matching_movies = REDIS.hmget(data_key, *data_hash_keys)
 
-      matching_movies.map {|movie| JSON.parse(movie, symbolize_names: true)}
+      matching_movies.map! {|movie| JSON.parse(movie, symbolize_names: true)}
+
+      Result.new(prefixes.join(' '), matching_movies)
     end
 
     def incr_score_for(movie_hash)
