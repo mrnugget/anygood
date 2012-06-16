@@ -14,6 +14,20 @@ module AnyGood
       erb :index
     end
 
+    get '/api/search' do
+      content_type :json
+
+      if params[:term]
+        movie_matcher = MovieMatcher.new
+        result        = movie_matcher.find_by_prefixes(params[:term].split(' '))
+
+        result.to_json
+      else
+        status 422
+        {error: 'You have to provide a term'}.to_json
+      end
+    end
+
     get '/api/movies/:year/:moviename' do
       content_type :json
 

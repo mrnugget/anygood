@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'API' do
+describe '/api/movies' do
   it 'allows me to get information and ratings of a movie as JSON' do
     # IMDB Client
     stub_http_request(
