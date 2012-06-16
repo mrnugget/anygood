@@ -17,6 +17,35 @@ describe AnyGood::MovieMatcher do
     AnyGood::MovieMatcher.new
   end
 
+  describe AnyGood::MovieMatcher::Result do
+
+    let(:matching_movies) do
+      [movie_hash, movie_hash.merge(name: 'The Dark Knight Rises')]
+    end
+
+    describe 'initialize' do
+      it 'sets the right attributes' do
+        result = AnyGood::MovieMatcher::Result.new('The Dark', matching_movies)
+
+        result.search_term.should == 'The Dark'
+        result.movies.should == matching_movies
+        result.count.should == 2
+      end
+    end
+
+    describe '#to_json' do
+      it 'represents the result as JSON' do
+        result = AnyGood::MovieMatcher::Result.new('The Dark', matching_movies)
+
+        json_result   = result.to_json
+
+        parsed_result = JSON.parse(json_result)
+        parsed_result['search_term'].should == 'The Dark'
+        parsed_result['movies'].should include({'name' => 'The Dark Knight', 'year' => 2008})
+      end
+    end
+  end
+
   describe '.add_movie' do
     it 'saves the movie hash as JSON to a redis hash' do
       AnyGood::REDIS.should_receive(:hset).with(
@@ -45,35 +74,6 @@ describe AnyGood::MovieMatcher do
       end
 
       movie_matcher.add_movie(movie_hash)
-    end
-  end
-
-  describe AnyGood::MovieMatcher::Result do
-
-    let(:matching_movies) do
-      [movie_hash, movie_hash.merge(name: 'The Dark Knight Rises')]
-    end
-
-    describe 'initialize' do
-      it 'sets the right attributes' do
-        result = AnyGood::MovieMatcher::Result.new('The Dark', matching_movies)
-
-        result.search_term.should == 'The Dark'
-        result.movies.should == matching_movies
-        result.count.should == 2
-      end
-    end
-
-    describe '#to_json' do
-      it 'represents the result as JSON' do
-        result = AnyGood::MovieMatcher::Result.new('The Dark', matching_movies)
-
-        json_result   = result.to_json
-
-        parsed_result = JSON.parse(json_result)
-        parsed_result['search_term'].should == 'The Dark'
-        parsed_result['movies'].should include({'name' => 'The Dark Knight', 'year' => 2008})
-      end
     end
   end
 
@@ -142,6 +142,13 @@ describe AnyGood::MovieMatcher do
 
       result = movie_matcher.find_by_prefixes(['the'])
       result.movies.first.should == movie_hash
+    end
+
+    it 'returns an empty Result object when no movie is found' do
+      result = movie_matcher.find_by_prefixes(['not', 'found'])
+
+      result.movies.should be_empty
+      result.count.should eq(0)
     end
   end
 

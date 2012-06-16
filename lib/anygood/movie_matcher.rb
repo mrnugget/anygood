@@ -41,11 +41,15 @@ module AnyGood
       end
 
       data_hash_keys  = REDIS.zrevrange(intersection_key, 0, -1)
-      matching_movies = REDIS.hmget(data_key, *data_hash_keys)
 
-      matching_movies.map! {|movie| JSON.parse(movie, symbolize_names: true)}
+      if data_hash_keys.empty?
+        Result.new(prefixes.join(' '), [])
+      else
+        matching_movies = REDIS.hmget(data_key, *data_hash_keys)
+        matching_movies.map! {|movie| JSON.parse(movie, symbolize_names: true)}
 
-      Result.new(prefixes.join(' '), matching_movies)
+        Result.new(prefixes.join(' '), matching_movies)
+      end
     end
 
     def incr_score_for(movie_hash)
