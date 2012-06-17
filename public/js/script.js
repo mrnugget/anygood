@@ -54,7 +54,6 @@ $(function () {
     },
     select: function(event,ui) {
       $('#movie_year_input').val(ui.item.year);
-      $(this).parents('form').submit();
     },
     minLength: 2
   });
