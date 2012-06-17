@@ -17,9 +17,13 @@
       <form action="/api/movies" id="search_movie">
         <label for="movie_name_input">Name:</label>
         <input id="movie_name_input" type="text" name="movie_name_input">
-        <input id="movie_year" type="hidden" name="movie_year">
+        <input id="movie_year_input" type="hidden" name="movie_year_input">
         <input type="submit" value="Search">
       </form>
+
+      <div id="loading" style="display: none;">
+        Loading...
+      </div>
 
       <div id="result">
 
