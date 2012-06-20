@@ -23,12 +23,15 @@ module AnyGood
       prefixes    = prefixes_for(movie_hash[:name])
       hashed_name = data_hash_key_for(movie_hash)
 
-      prefixes.each do |prefix|
-        score = REDIS.zscore(index_key_for(prefix), hashed_name).to_i || 0
-        REDIS.zadd(index_key_for(prefix), score, hashed_name)
-      end
+      score = REDIS.zscore(index_key_for(prefixes.first), hashed_name).to_i || 0
 
-      REDIS.hset(data_key, hashed_name, movie_hash.to_json)
+      REDIS.pipelined do
+        prefixes.each do |prefix|
+          REDIS.zadd(index_key_for(prefix), score, hashed_name)
+        end
+
+        REDIS.hset(data_key, hashed_name, movie_hash.to_json)
+      end
     end
 
     def find_by_prefixes(prefixes)
