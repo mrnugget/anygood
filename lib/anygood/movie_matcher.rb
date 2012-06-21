@@ -23,10 +23,6 @@ module AnyGood
 
     def initialize(attributes = {})
       @limit = attributes.delete(:limit) || 5
-
-      attributes.each do |k, v|
-        send("#{k}=", v)
-      end
     end
 
     def add_movie(movie_hash)
