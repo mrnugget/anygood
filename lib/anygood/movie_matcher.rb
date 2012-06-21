@@ -19,6 +19,16 @@ module AnyGood
       end
     end
 
+    attr_accessor :limit
+
+    def initialize(attributes = {})
+      @limit = attributes.delete(:limit) || 5
+
+      attributes.each do |k, v|
+        send("#{k}=", v)
+      end
+    end
+
     def add_movie(movie_hash)
       prefixes    = prefixes_for(movie_hash[:name])
       hashed_name = data_hash_key_for(movie_hash)
@@ -43,7 +53,7 @@ module AnyGood
         REDIS.expire(intersection_key, 7200)
       end
 
-      data_hash_keys  = REDIS.zrevrange(intersection_key, 0, -1)
+      data_hash_keys  = REDIS.zrevrange(intersection_key, 0, @limit - 1)
 
       if data_hash_keys.empty?
         Result.new(prefixes.join(' '), [])

@@ -46,7 +46,21 @@ describe AnyGood::MovieMatcher do
     end
   end
 
-  describe '.add_movie' do
+  describe 'initialize' do
+    it 'sets the limit accordingly' do
+      movie_matcher = AnyGood::MovieMatcher.new(limit: 5)
+
+      movie_matcher.limit.should eq(5)
+    end
+
+    it 'sets the default limit when its not specified' do
+      movie_matcher = AnyGood::MovieMatcher.new
+
+      movie_matcher.limit.should eq(5)
+    end
+  end
+
+  describe '#add_movie' do
     it 'saves the movie hash as JSON to a redis hash' do
       AnyGood::REDIS.should_receive(:hset).with(
         'moviesearch:data',
@@ -77,7 +91,7 @@ describe AnyGood::MovieMatcher do
     end
   end
 
-  describe '.find_by_prefixes' do
+  describe '#find_by_prefixes' do
     it 'returns a MovieMatcher::Result object' do
       movie_matcher.add_movie(movie_hash)
 
@@ -127,6 +141,18 @@ describe AnyGood::MovieMatcher do
       result.movies.should_not include(inception)
     end
 
+    it 'returns at max the number of movies specified via limit' do
+      dark_knight_rises = movie_hash.merge(name: 'The Dark Knight Rises')
+
+      movie_matcher.add_movie(movie_hash)
+      movie_matcher.add_movie(dark_knight_rises)
+      movie_matcher.limit = 1
+
+      result = movie_matcher.find_by_prefixes(['dark'])
+
+      result.count.should eq(1)
+    end
+
     it 'works case-insensitive when passes prefixes' do
       movie_matcher.add_movie(movie_hash)
 
@@ -152,7 +178,7 @@ describe AnyGood::MovieMatcher do
     end
   end
 
-  describe '.incr_score_for' do
+  describe '#incr_score_for' do
     it 'increments the score of the movies data hash key in the prefix sets' do
       %w(th the da dar dark kn kni knig knigh knight).each do |prefix|
         AnyGood::REDIS.should_receive(:zincrby).with("moviesearch:index:#{prefix}",1,md5_hash_name)
