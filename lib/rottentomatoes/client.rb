@@ -18,17 +18,19 @@ module RottenTomatoes
     end
 
     def rating
-      {
-        score: combined_score,
-        url: @data['links']['alternate']
-      }
+      if @data
+        {score: combined_score, url: @data['links']['alternate']}
+      else
+        {error: 'Could not be found'}
+      end
     end
 
     def info
-      {
-        poster:  @data['posters']['detailed'],
-        year:    @year
-      }
+      if @data
+        {poster: @data['posters']['detailed'], year: @year}
+      else
+        {error: 'Could not be found'}
+      end
     end
 
     private

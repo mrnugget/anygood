@@ -53,6 +53,34 @@ describe '/api/movies' do
     parsed_body['combined_rating'].should == 8.95
   end
 
+  it 'does not fail if one client can not find the movie matching the criteria' do
+    # RottenTomatoes Client
+    stub_http_request(
+      :get, "http://api.rottentomatoes.com/api/public/v1.0/movies.json"
+    ).with(
+      :query => {"apikey" => 'art7wzby22d4vmxfs9zw4qjh', 'q' => 'Inception' }
+    ).to_return(
+      body: File.read('./spec/fixtures/rt_inception_wrong_year.json')
+    )
+
+    # IMDB Client
+    stub_http_request(
+      :get, "http://www.imdbapi.com/"
+    ).with(
+      :query => {"t" => 'Inception', 'y' => '2010' }
+    ).to_return(
+      body: File.read('./spec/fixtures/imdb_inception.json')
+    )
+
+    get '/api/movies/2010/Inception'
+
+    parsed_body = JSON.parse(last_response.body)
+
+    parsed_body['ratings']['IMDB']['score'].should == 8.8
+    parsed_body['combined_rating'].should == 8.8
+    parsed_body['ratings']['Rotten Tomatoes']['error'].should == 'Could not be found'
+  end
+
   it 'works with escaped movie names in the url and returns the right moviename' do
     stub_request(
       :get, "http://www.imdbapi.com/?t=The%20Good,%20The%20Bad%20And%20The%20Ugly&y=1966"
