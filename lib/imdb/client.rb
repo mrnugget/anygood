@@ -33,7 +33,7 @@ module IMDB
       def fetch_data
         begin
           response = JSON.parse(query_api)
-          if response['Title'] == @moviename && response['Year'].to_i == @year
+          if response['Title'].downcase == @moviename.downcase && response['Year'].to_i == @year
             response
           else
             {error: 'Could not be found'}
