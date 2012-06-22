@@ -25,11 +25,7 @@ module AnyGood
         cached_info = REDIS.get(info_key_for(moviename, client.name))
 
         unless cached_info
-          begin
-            fetch_and_save_to_cache(:info, ::RottenTomatoes::Client, moviename, year)
-          rescue JSON::ParserError
-            {error: 'Could not be parsed'}
-          end
+          fetch_and_save_to_cache(:info, ::RottenTomatoes::Client, moviename, year)
         else
           JSON.parse(cached_info, symbolize_names: true)
         end
@@ -42,11 +38,7 @@ module AnyGood
           cached_rating = REDIS.get(rating_key_for(moviename, client.name))
 
           unless cached_rating
-            ratings[client.name] = begin
-              fetch_and_save_to_cache(:rating, client, moviename, year)
-            rescue JSON::ParserError
-              {error: 'Could not be parsed'}
-            end
+            ratings[client.name] = fetch_and_save_to_cache(:rating, client, moviename, year)
           else
             ratings[client.name] = JSON.parse(cached_rating, symbolize_names: true)
           end

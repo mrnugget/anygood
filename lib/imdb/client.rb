@@ -18,16 +18,33 @@ module IMDB
     end
 
     def rating
-      {
-        score: @data['imdbRating'].to_f,
-        url: "http://www.imdb.com/title/" + @data['imdbID']
-      }
+      if found?
+        {
+          score: @data['imdbRating'].to_f,
+          url: "http://www.imdb.com/title/" + @data['imdbID']
+        }
+      else
+        @data
+      end
     end
 
     private
 
       def fetch_data
-        JSON.parse(query_api)
+        begin
+          response = JSON.parse(query_api)
+          if response['Title'] == @moviename && response['Year'].to_i == @year
+            response
+          else
+            {error: 'Could not be found'}
+          end
+        rescue JSON::ParserError
+          {error: 'Could not be parsed'}
+        end
+      end
+
+      def found?
+        @data && @data[:error].nil?
       end
 
       def query_api

@@ -18,29 +18,24 @@ module RottenTomatoes
     end
 
     def rating
-      if @data
-        {score: combined_score, url: @data['links']['alternate']}
-      else
-        {error: 'Could not be found'}
-      end
+      found? ? {score: combined_score, url: @data['links']['alternate']} : @data
     end
 
     def info
-      if @data
-        {poster: @data['posters']['detailed'], year: @year}
-      else
-        {error: 'Could not be found'}
-      end
+      found? ? {poster: @data['posters']['detailed'], year: @year} : @data
     end
 
     private
 
       def fetch_data
-        results = JSON.parse(query_api)
-        matching_movies = results['movies'].select do |movie|
-          movie['year'] == @year
+        begin
+          results         = JSON.parse(query_api)
+          matching_movies = results['movies'].select {|movie| movie['year'] == @year}
+
+          matching_movies.first || {error: 'Could not be found'}
+        rescue JSON::ParserError
+          {error: 'Could not be parsed'}
         end
-        matching_movies.first || nil
       end
 
       def combined_score
@@ -48,6 +43,10 @@ module RottenTomatoes
         audience = @data['ratings']['audience_score'].to_f
 
         ("%.2f" % (((critics + audience) / 2) * 0.1)).to_f
+      end
+
+      def found?
+        @data && @data[:error].nil?
       end
 
       def query_api
