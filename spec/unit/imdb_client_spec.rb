@@ -2,13 +2,7 @@ require 'spec_helper'
 
 describe AnyGood::Clients::IMDB do
   before(:each) do
-    stub_http_request(
-      :get, "http://www.imdbapi.com/"
-    ).with(
-      :query => {"t" => 'Inception', 'y' => '2010' }
-    ).to_return(
-      body: File.read('./spec/fixtures/imdb_inception.json')
-    )
+    stub_imdb_query('Inception', 2010, 'imdb_inception')
   end
 
   describe '.name' do
@@ -35,12 +29,7 @@ describe AnyGood::Clients::IMDB do
     end
 
     it 'works with movienames inluding whitespaces and special characters' do
-      stub_request(
-        :get, "http://www.imdbapi.com/?t=The%20Good,%20The%20Bad%20And%20The%20Ugly&y=1966"
-      ).to_return(
-        body: File.read('./spec/fixtures/imdb_goodbadandugly.json')
-      )
-
+      stub_imdb_query("The%20Good,%20The%20Bad%20And%20The%20Ugly", 1966, 'imdb_goodbadandugly')
 
       AnyGood::Clients::IMDB.fetch('The Good, The Bad And The Ugly', 1966)
 

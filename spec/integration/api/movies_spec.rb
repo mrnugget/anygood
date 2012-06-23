@@ -2,22 +2,8 @@ require 'spec_helper'
 
 describe '/api/movies' do
   it 'allows me to get information and ratings of a movie as JSON' do
-    # IMDB Client
-    stub_http_request(
-      :get, "http://www.imdbapi.com/"
-    ).with(
-      :query => {"t" => 'Inception', 'y' => '2010' }
-    ).to_return(
-      body: File.read('./spec/fixtures/imdb_inception.json')
-    )
-    # RottenTomatoes Client
-    stub_http_request(
-      :get, "http://api.rottentomatoes.com/api/public/v1.0/movies.json"
-    ).with(
-      :query => {"apikey" => 'art7wzby22d4vmxfs9zw4qjh', 'q' => 'Inception' }
-    ).to_return(
-      body: File.read('./spec/fixtures/rt_inception.json')
-    )
+    stub_rottentomatoes_query('Inception', 'rt_inception')
+    stub_imdb_query('Inception', 2010, 'imdb_inception')
 
     get '/api/movies/2010/Inception'
 
@@ -28,23 +14,8 @@ describe '/api/movies' do
   end
 
   it 'does not fail if one clients has a parse error' do
-    # RottenTomatoes Client
-    stub_http_request(
-      :get, "http://api.rottentomatoes.com/api/public/v1.0/movies.json"
-    ).with(
-      :query => {"apikey" => 'art7wzby22d4vmxfs9zw4qjh', 'q' => 'Inception' }
-    ).to_return(
-      body: File.read('./spec/fixtures/rt_inception.json')
-    )
-
-    # IMDB Client
-    stub_http_request(
-      :get, "http://www.imdbapi.com/"
-    ).with(
-      :query => {"t" => 'Inception', 'y' => '2010' }
-    ).to_return(
-      body: File.read('./spec/fixtures/json_parse_error.json')
-    )
+    stub_rottentomatoes_query('Inception', 'rt_inception')
+    stub_imdb_query('Inception', 2010, 'json_parse_error')
 
     get '/api/movies/2010/Inception'
 
@@ -54,23 +25,9 @@ describe '/api/movies' do
   end
 
   it 'does not fail if one client can not find the movie matching the criteria' do
-    # RottenTomatoes Client
-    stub_http_request(
-      :get, "http://api.rottentomatoes.com/api/public/v1.0/movies.json"
-    ).with(
-      :query => {"apikey" => 'art7wzby22d4vmxfs9zw4qjh', 'q' => 'Inception' }
-    ).to_return(
-      body: File.read('./spec/fixtures/rt_inception_wrong_year.json')
-    )
+    stub_rottentomatoes_query('Inception', 'rt_inception_wrong_year')
 
-    # IMDB Client
-    stub_http_request(
-      :get, "http://www.imdbapi.com/"
-    ).with(
-      :query => {"t" => 'Inception', 'y' => '2010' }
-    ).to_return(
-      body: File.read('./spec/fixtures/imdb_inception.json')
-    )
+    stub_imdb_query('Inception', 2010, 'imdb_inception')
 
     get '/api/movies/2010/Inception'
 
@@ -82,16 +39,8 @@ describe '/api/movies' do
   end
 
   it 'works with escaped movie names in the url and returns the right moviename' do
-    stub_request(
-      :get, "http://www.imdbapi.com/?t=The%20Good,%20The%20Bad%20And%20The%20Ugly&y=1966"
-    ).to_return(
-      body: File.read('./spec/fixtures/imdb_goodbadandugly.json')
-    )
-    stub_request(
-      :get, "http://api.rottentomatoes.com/api/public/v1.0/movies.json?apikey=art7wzby22d4vmxfs9zw4qjh&q=The%20Good,%20The%20Bad%20And%20The%20Ugly").
-    to_return(
-      body: File.read('./spec/fixtures/rt_goodbadandugly.json')
-    )
+    stub_imdb_query("The%20Good,%20The%20Bad%20And%20The%20Ugly", 1966, 'imdb_goodbadandugly')
+    stub_rottentomatoes_query('The%20Good,%20The%20Bad%20And%20The%20Ugly', 'rt_goodbadandugly')
 
     get '/api/movies/1966/The%20Good,%20The%20Bad%20And%20The%20Ugly'
 

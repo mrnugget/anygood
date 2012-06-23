@@ -2,13 +2,7 @@ require 'spec_helper'
 
 describe AnyGood::Clients::RottenTomatoes do
   before(:each) do
-    stub_http_request(
-      :get, "http://api.rottentomatoes.com/api/public/v1.0/movies.json"
-    ).with(
-      :query => {"apikey" => 'art7wzby22d4vmxfs9zw4qjh', 'q' => 'Inception' }
-    ).to_return(
-      body: File.read('./spec/fixtures/rt_inception.json')
-    )
+    stub_rottentomatoes_query('Inception', 'rt_inception')
   end
 
   describe '.name' do
@@ -35,26 +29,19 @@ describe AnyGood::Clients::RottenTomatoes do
     end
 
     it 'works with movienames including whitespaces and special characters' do
-      stub_request(
-        :get, "http://api.rottentomatoes.com/api/public/v1.0/movies.json?apikey=art7wzby22d4vmxfs9zw4qjh&q=The%20Good,%20The%20Bad%20And%20The%20Ugly").
-       to_return(
-         body: File.read('./spec/fixtures/rt_goodbadandugly.json')
-      )
+      stub_rottentomatoes_query('The%20Good,%20The%20Bad%20And%20The%20Ugly', 'rt_goodbadandugly')
 
       AnyGood::Clients::RottenTomatoes.fetch('The Good, The Bad And The Ugly', 1966)
 
       a_request(
-        :get, "http://api.rottentomatoes.com/api/public/v1.0/movies.json?apikey=art7wzby22d4vmxfs9zw4qjh&q=The%20Good,%20The%20Bad%20And%20The%20Ugly"
+        :get, rottentomatoes_api_url + "The%20Good,%20The%20Bad%20And%20The%20Ugly"
       ).should have_been_made
     end
 
     context 'the API returns more than one result' do
       it 'should return the movie matching the criteria' do
-        stub_request(
-          :get, "http://api.rottentomatoes.com/api/public/v1.0/movies.json?apikey=art7wzby22d4vmxfs9zw4qjh&q=The%20Good,%20The%20Bad%20And%20The%20Ugly").
-         to_return(
-           body: File.read('./spec/fixtures/rt_goodbadandugly.json')
-        )
+        stub_rottentomatoes_query('The%20Good,%20The%20Bad%20And%20The%20Ugly', 'rt_goodbadandugly')
+
         rt_client = AnyGood::Clients::RottenTomatoes.fetch('The Good, The Bad And The Ugly', 1966)
         rt_client.rating[:score].should == 9.5
       end
