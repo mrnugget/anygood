@@ -26,7 +26,7 @@ describe AnyGood::Movie do
       'Rotten Tomatoes' => {score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
     }
 
-    info = RottenTomatoes::Client.fetch('Inception', 2010).info
+    info = AnyGood::Clients::RottenTomatoes.fetch('Inception', 2010).info
 
     movie = AnyGood::Movie.new(name: 'Inception', ratings: ratings,info: info)
     json_movie = movie.as_json

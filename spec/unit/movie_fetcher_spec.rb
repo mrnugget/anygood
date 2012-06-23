@@ -89,7 +89,7 @@ describe AnyGood::MovieFetcher do
           {score: 9.0, url: 'example.org'}.to_json
         )
 
-        IMDB::Client.should_not_receive(:fetch)
+        AnyGood::Clients::IMDB.should_not_receive(:fetch)
 
         AnyGood::MovieFetcher.fetch_by_name_and_year('Inception', 2010)
       end
@@ -100,7 +100,7 @@ describe AnyGood::MovieFetcher do
           {score: 9.0, url: 'example.org'}.to_json
         )
 
-        RottenTomatoes::Client.should_receive(:fetch).once {
+        AnyGood::Clients::RottenTomatoes.should_receive(:fetch).once {
           stub(:rt).as_null_object
         }
 
@@ -116,7 +116,7 @@ describe AnyGood::MovieFetcher do
           }.to_json
         )
 
-        RottenTomatoes::Client.should_receive(:fetch).once {
+        AnyGood::Clients::RottenTomatoes.should_receive(:fetch).once {
           stub(:rt).as_null_object
         }
 

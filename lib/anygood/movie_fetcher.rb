@@ -7,7 +7,7 @@ module AnyGood
 
     def fetch_by_name_and_year(moviename, year)
       ratings = ratings_from_cache_or_clients(moviename, year)
-      info    = info_from_cache_or_client(::RottenTomatoes::Client, moviename, year)
+      info    = info_from_cache_or_client(Clients::RottenTomatoes, moviename, year)
 
       Movie.new(name: moviename, ratings: ratings, info: info)
     end
@@ -16,8 +16,8 @@ module AnyGood
 
       def clients
         [
-          ::IMDB::Client,
-          ::RottenTomatoes::Client,
+          Clients::IMDB,
+          Clients::RottenTomatoes,
         ]
       end
 
@@ -25,7 +25,7 @@ module AnyGood
         cached_info = REDIS.get(info_key_for(moviename, client.name))
 
         unless cached_info
-          fetch_and_save_to_cache(:info, ::RottenTomatoes::Client, moviename, year)
+          fetch_and_save_to_cache(:info, Clients::RottenTomatoes, moviename, year)
         else
           JSON.parse(cached_info, symbolize_names: true)
         end
