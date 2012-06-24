@@ -38,6 +38,16 @@ describe '/api/search' do
     parsed_body[:movies].should include({name: 'The Dark Knight Rises', year: 2012})
   end
 
+  it 'returns the movies ordered by score' do
+    @movie_matcher.add_movie(name: 'The Dark Knight Rises', year: 2012)
+    @movie_matcher.incr_score_for(movie_hash)
+
+    get '/api/search?term=The%20Dark'
+
+    parsed_body = JSON.parse(last_response.body, symbolize_names: true)
+    parsed_body[:movies].first.should == movie_hash
+  end
+
   it 'returns an empty movies array if nothing is found' do
     get '/api/search?term=Indiana'
 
