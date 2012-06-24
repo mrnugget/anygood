@@ -12,6 +12,7 @@ $(function () {
         $('#loading').show();
       },
       success: function(movie){
+        console.log(movie);
         var movie_html = '';
 
         movie_html += '<h3>' + movie.name + ' (' + movie.info.year + ')</h3>';
@@ -21,8 +22,13 @@ $(function () {
         var movie_ratings = '<h4>Ratings: </h4>';
 
         $.each(movie.ratings, function(rating_site, rating) {
-          movie_ratings += '<h4><a href="' + rating.url + '">';
-          movie_ratings += rating_site + '</a>:</h4> ' + rating.score;
+          if (rating.error) {
+            movie_ratings += '<h4>' + rating_site + '</h4>';
+            movie_ratings += rating.error;
+          } else {
+            movie_ratings += '<h4><a href="' + rating.url + '">';
+            movie_ratings += rating_site + '</a>:</h4> ' + rating.score;
+          }
         });
 
         movie_html += movie_ratings;
