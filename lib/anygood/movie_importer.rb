@@ -16,10 +16,14 @@ module AnyGood
       end
 
       def parse_wiki_page(html)
-        doc = Nokogiri::HTML(html)
-        doc.css('table td i b a').inject([]) do |names, node|
+        names = []
+        doc   = Nokogiri::HTML(html)
+
+        doc.css('table.wikitable td i a').each do |node|
           names << node.children.first.text
         end
+
+        names.uniq
       end
   end
 end

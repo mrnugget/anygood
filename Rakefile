@@ -18,3 +18,16 @@ task :console do
   puts 'Loading AnyGood bootfile...'
   system('irb -r ./config/boot.rb')
 end
+
+namespace :movies do
+  desc 'Import movie names from Wikipedia and add to Redis'
+  task :import do
+    puts "Importing movies of the year #{ENV['year']}"
+    movie_matcher  = AnyGood::MovieMatcher.new
+    movie_importer = AnyGood::MovieImporter.new(ENV['year'])
+
+    movie_importer.fetch_movies.each do |movie_name|
+      movie_matcher.add_movie(name: movie_name, year: ENV['year'])
+    end
+  end
+end
