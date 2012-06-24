@@ -1,0 +1,7 @@
+require_relative './anygood/clients/client'
+require_relative './anygood/clients/imdb'
+require_relative './anygood/clients/rotten_tomatoes'
+require_relative './anygood/movie'
+require_relative './anygood/movie_matcher'
+require_relative './anygood/movie_fetcher'
+require_relative './anygood/movie_importer'
