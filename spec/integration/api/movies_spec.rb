@@ -1,10 +1,12 @@
 require 'spec_helper'
 
 describe '/api/movies' do
-  it 'allows me to get information and ratings of a movie as JSON' do
+  before(:each) do
     stub_rottentomatoes_query('Inception', 'rt_inception')
     stub_imdb_query('Inception', 2010, 'imdb_inception')
+  end
 
+  it 'allows me to get information and ratings of a movie as JSON' do
     get '/api/movies/2010/Inception'
 
     parsed_body = JSON.parse(last_response.body)
@@ -14,7 +16,6 @@ describe '/api/movies' do
   end
 
   it 'does not fail if one clients has a parse error' do
-    stub_rottentomatoes_query('Inception', 'rt_inception')
     stub_imdb_query('Inception', 2010, 'json_parse_error')
 
     get '/api/movies/2010/Inception'
@@ -26,8 +27,6 @@ describe '/api/movies' do
 
   it 'does not fail if one client can not find the movie matching the criteria' do
     stub_rottentomatoes_query('Inception', 'rt_inception_wrong_year')
-
-    stub_imdb_query('Inception', 2010, 'imdb_inception')
 
     get '/api/movies/2010/Inception'
 
@@ -72,5 +71,14 @@ describe '/api/movies' do
     parsed_body['ratings']['IMDB']['url'].should == 'example.org'
 
     a_request(:get, /www/).should_not have_been_made
+  end
+
+  it 'increments the score of a movie after it is fetched' do
+    movie_matcher = stub(:movie_matcher)
+    AnyGood::MovieMatcher.stub(new: movie_matcher)
+
+    movie_matcher.should_receive(:incr_score_for).with({name: 'Inception', year: 2010})
+
+    get '/api/movies/2010/Inception'
   end
 end
