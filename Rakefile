@@ -1,15 +1,18 @@
 #!/usr/bin/env rake
 
 require File.dirname(__FILE__) + '/config/boot.rb'
-require 'rspec/core/rake_task'
 
-desc 'Default: run rspec spec'
-task :default => :spec
+unless ENV["RACK_ENV"] == 'production'
+  require 'rspec/core/rake_task'
 
-desc 'Run rspec specs'
-task :spec do
-  RSpec::Core::RakeTask.new(:spec) do |t|
-    t.pattern = './spec/**/*_spec.rb'
+  desc 'Default: run rspec spec'
+  task :default => :spec
+
+  desc 'Run rspec specs'
+  task :spec do
+    RSpec::Core::RakeTask.new(:spec) do |t|
+      t.pattern = './spec/**/*_spec.rb'
+    end
   end
 end
 
