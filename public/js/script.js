@@ -60,6 +60,8 @@ $(function () {
     },
     select: function(event,ui) {
       $('#movie_year_input').val(ui.item.year);
+      $('#movie_name_input').val(ui.item.value);
+      $(this).parents('form').submit();
     },
     minLength: 2
   });
