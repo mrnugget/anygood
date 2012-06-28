@@ -32,7 +32,7 @@ $(function () {
         $('#loading').show();
       },
       success: function(movie){
-        movieHtml = generateHtmlFromMovie(movie);
+        var movieHtml = generateHtmlFromMovie(movie);
         $('#result').html(movieHtml);
         $('#loading').hide();
       }
