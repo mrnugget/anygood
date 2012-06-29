@@ -1,44 +1,44 @@
 $(function () {
-  $('#search_movie').submit(function(){
-    function generateHtmlFromMovie(movie) {
-      var movieHtml = '';
+  // $('#search_movie').submit(function(){
+  //   function generateHtmlFromMovie(movie) {
+  //     var movieHtml = '';
 
-      movieHtml += '<h3>' + movie.name + ' (' + movie.year + ')</h3>';
-      movieHtml += '<img src="' + movie.info.poster + '">';
-      movieHtml += '<h4>Combined Rating: ' + movie.combined_rating + '</h4>';
+  //     movieHtml += '<h3>' + movie.name + ' (' + movie.info.year + ')</h3>';
+  //     movieHtml += '<img src="' + movie.info.poster + '">';
+  //     movieHtml += '<h4>Combined Rating: ' + movie.combined_rating + '</h4>';
 
-      var movieRatings = '<h4>Ratings: </h4>';
-      $.each(movie.ratings, function(rating_site, rating) {
-        if (rating.error) {
-          movieRatings += '<h4>' + rating_site + '</h4>';
-          movieRatings += rating.error;
-        } else {
-          movieRatings += '<h4><a href="' + rating.url + '">';
-          movieRatings += rating_site + '</a>:</h4> ' + rating.score;
-        }
-      });
-      movieHtml += movieRatings;
-      return movieHtml;
-    }
+  //     var movieRatings = '<h4>Ratings: </h4>';
+  //     $.each(movie.ratings, function(rating_site, rating) {
+  //       if (rating.error) {
+  //         movieRatings += '<h4>' + rating_site + '</h4>';
+  //         movieRatings += rating.error;
+  //       } else {
+  //         movieRatings += '<h4><a href="' + rating.url + '">';
+  //         movieRatings += rating_site + '</a>:</h4> ' + rating.score;
+  //       }
+  //     });
+  //     movieHtml += movieRatings;
+  //     return movieHtml;
+  //   }
 
-    var $form     = $(this);
-    var movieName = $form.children('#movie_name_input').val();
-    var movieYear = $form.children('#movie_year_input').val();
-    var apiUrl    = $form.attr('action') + '/' + movieYear + '/' + movieName;
+  //   var $form     = $(this);
+  //   var movieName = $form.children('#movie_name_input').val();
+  //   var movieYear = $form.children('#movie_year_input').val();
+  //   var apiUrl    = $form.attr('action') + '/' + movieYear + '/' + movieName;
 
-    $.ajax({
-      url: apiUrl,
-      beforeSend: function() {
-        $('#loading').show();
-      },
-      success: function(movie){
-        var movieHtml = generateHtmlFromMovie(movie);
-        $('#result').html(movieHtml);
-        $('#loading').hide();
-      }
-    });
-    return false;
-  });
+  //   $.ajax({
+  //     url: apiUrl,
+  //     beforeSend: function() {
+  //       $('#loading').show();
+  //     },
+  //     success: function(movie){
+  //       var movieHtml = generateHtmlFromMovie(movie);
+  //       $('#result').html(movieHtml);
+  //       $('#loading').hide();
+  //     }
+  //   });
+  //   return false;
+  // });
 
   $('#movie_name_input').autocomplete({
     source: function(request, response) {
@@ -64,5 +64,32 @@ $(function () {
       $(this).parents('form').submit();
     },
     minLength: 2
+  });
+
+  var Movie = Backbone.Model.extend({
+    defaults: {
+      name: '',
+      info: '',
+      ratings: {},
+      combined_rating: 0
+    },
+    initialize: function(){
+      console.log('Movie has been initialized');
+    },
+    url: '/api/movies'
+  });
+
+  var MovieView = Backbone.View.extend({
+    template: _.template($('#movie-template').html()),
+
+    initialize: function() {
+      _.bindAll(this, 'render');
+      this.model.on('change', this.render);
+    },
+
+    render: function() {
+      this.$el.html(this.template(this.model.toJSON()));
+      return this;
+    }
   });
 });
