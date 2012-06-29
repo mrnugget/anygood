@@ -1,40 +1,41 @@
 # Any good?
 
-This is a fun project of mine that in the end should be able to present a user a
-lot of different ratings for a given movie, so you don't have to check different
-sites in order to know if a movie is any good.
+So! You quickly want to see if a movie was any good, without sifting through
+reviews and comparing different ratings on different websites? Great, AnyGood is
+here to help.
 
-There is still a lot of work to be done, e.g.: the is absolutely no frontend for
-this app, the only thing that is kinda working is the API in the background.
+Mind you, this is side-project of mine, purely made for fun and interest, there
+is no commercial interest involved in this and it's totally open-source. So, go
+ahead, if you have any features, ideas, bugfixes, bugs, problems: open a pull
+request or submit an issue!
 
-## Installation & Usage
+## AnyGood
 
-Come on, let's get this thing running on your computer:
-
-```bash
-git clone git://github.com/mrnugget/anygood.git
-cd anygood
-bundle install
-rackup -p 4567
-```
-
-And now open `http://localhost:4567` in your browser.
-
-## Look up a movie's ratings
-
-When you visit the site type in the name of the movie and the year it was
-released and the ratings should show up.
+The application is a pretty small sinatra app with a single html page at the
+moment. Caching and autocompletion is handled with Redis.
 
 ## API
 
-The current API resides at `/api/movies`. So, let's say you want to check the
-combined ratings for the movie 'Inception' of the year 2010. The API endpoint
-would this:
+The base url for the api is `/api`.
+
+### Movies
+
+The basic format of the movie endpoint is
+
+```
+/api/movies/<movie_year>/<movie_name>
+```
+
+Let's say you want to check the combined ratings for the movie 'Inception' of
+the year 2010. The API endpoint would be the following: 
 
 ```
 /api/movies/2010/Inception
 ```
-The response is JSON and should look like this:
+
+This will trigger all the implemented clients to get ratings from their
+respective site for the movie. The constructed movie object is then serialized
+to JSON and the output from the route above should look like this:
 
 ```json
 {
@@ -57,11 +58,56 @@ The response is JSON and should look like this:
 }
 ```
 
+### Search & Autocompletion
+
+The autocompletion for the input field is reachable under
+
+```
+/api/search
+```
+
+In order to get the possible movies you need to supply a `term`:
+
+```
+/api/search?term=incep
+```
+
+So, with only two movies containing that term in its name, the output would be
+the following:
+
+```
+{
+  "search_term":"Incep",
+  "movies":[
+    {
+      "name":"Inception",
+      "year":2010
+    },
+    {
+      "name":"Inception Two - Sweet Dreams",
+      "year":2018
+    }
+  ]
+}
+```
+
+With that information it's easy to use the `/api/movies` endpoint to get the
+ratings for the specified movie.
+
 ## TODO
 
-- Better error handling in the API clients: currently the only thing that is
-  working is JSON Parser Errors. Handling of 404, 500, 503 and whatnot should be
-  implemented.
-- Add the following clients:
+- Error Handling:
+
+  Handling of 404, 500, 503 and whatnot errors.
+
+- Clients:
+  
+  There are a couple more clients I'd like to implement:
+
   - http://www.themoviedb.org
   - http://www.moviepilot.com
+
+- Movie Info:
+
+  Get more info from RottenTomatoes. Maybe plot description, director
+  and main actors.
