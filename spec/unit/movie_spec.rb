@@ -1,38 +1,61 @@
 require 'spec_helper'
 
 describe AnyGood::Movie do
-  it 'has a combined rating' do
-    ratings = {
-      'IMDB' => {score: 8.8, url: 'http://www.imdb.com/title/tt1375666/'},
-      'Rotten Tomatoes' => {score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
-    }
+  describe 'initialize' do
+    it 'sets the right attributes' do
+      ratings = {
+        'IMDB' => {score: 8.8, url: 'http://www.imdb.com/title/tt1375666/'},
+        'Rotten Tomatoes' => {score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
+      }
 
-    inception = AnyGood::Movie.new(ratings: ratings)
+      movie = AnyGood::Movie.new(
+        name: 'Inception',
+        year: 2010,
+        ratings: ratings,
+        info: 'movie_info_string'
+      )
 
-    inception.combined_rating.should == 8.875
+      movie.name.should == 'Inception'
+      movie.year.should eq(2010)
+      movie.ratings.should == ratings
+      movie.info.should == 'movie_info_string'
+    end
   end
 
-  it 'can be represented as JSON' do
-    stub_http_request(
-      :get, "http://api.rottentomatoes.com/api/public/v1.0/movies.json"
-    ).with(
-      :query => {"apikey" => 'art7wzby22d4vmxfs9zw4qjh', 'q' => 'Inception' }
-    ).to_return(
-      body: File.read('./spec/fixtures/rt_inception.json')
-    )
+  describe '#combined_rating' do
+    it 'returns the calculated combined rating' do
+      ratings = {
+        'IMDB' => {score: 8.8, url: 'http://www.imdb.com/title/tt1375666/'},
+        'Rotten Tomatoes' => {score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
+      }
 
-    ratings = {
-      'IMDB' => {score: 8.8, url: 'http://www.imdb.com/title/tt1375666/'},
-      'Rotten Tomatoes' => {score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
-    }
+      inception = AnyGood::Movie.new(ratings: ratings)
 
-    info = AnyGood::Clients::RottenTomatoes.fetch('Inception', 2010).info
+      inception.combined_rating.should == 8.875
+    end
+  end
 
-    movie = AnyGood::Movie.new(name: 'Inception', ratings: ratings,info: info)
-    json_movie = movie.as_json
+  describe '#to_json' do
+    it 'returns a representation of the movie as JSON string' do
+      movie = AnyGood::Movie.new(
+        name: 'Inception',
+        year: 2010,
+        ratings: {
+          'IMDB' => {score: 8.8, url: 'http://www.imdb.com/title/tt1375666/'},
+          'Rotten Tomatoes' => {score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
+        },
+        info: {
+          poster: 'http://content8.flixster.com/movie/10/93/37/10933762_det.jpg'
+        }
+      )
 
-    poster_url = 'http://content8.flixster.com/movie/10/93/37/10933762_det.jpg'
-    JSON.parse(json_movie)['info']['poster'].should == poster_url
-    JSON.parse(json_movie)['name'].should == 'Inception'
+      parsed_json_movie = JSON.parse(movie.as_json)
+
+      parsed_json_movie['name'].should == 'Inception'
+      parsed_json_movie['year'].should == 2010
+      parsed_json_movie['ratings']['IMDB']['score'].should == 8.8
+      parsed_json_movie['ratings']['Rotten Tomatoes']['score'].should == 8.95
+      parsed_json_movie['info']['poster'].should ==  'http://content8.flixster.com/movie/10/93/37/10933762_det.jpg'
+    end
   end
 end

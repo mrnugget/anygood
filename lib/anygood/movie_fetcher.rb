@@ -10,7 +10,7 @@ module AnyGood
       info    = info_from_cache_or_client(Clients::RottenTomatoes, moviename, year)
 
       MovieMatcher.new.incr_score_for(name: moviename, year: year)
-      Movie.new(name: moviename, ratings: ratings, info: info)
+      Movie.new(name: moviename, year: year, ratings: ratings, info: info)
     end
 
     private

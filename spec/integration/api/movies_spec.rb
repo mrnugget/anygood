@@ -11,6 +11,7 @@ describe '/api/movies' do
 
     parsed_body = JSON.parse(last_response.body)
     parsed_body['name'].should == 'Inception'
+    parsed_body['year'].should == 2010
     parsed_body['ratings']['Rotten Tomatoes']['score'].should == 8.95
     parsed_body['ratings']['IMDB']['score'].should == 8.8
   end

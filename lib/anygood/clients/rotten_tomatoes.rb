@@ -10,7 +10,7 @@ module AnyGood
       end
 
       def info
-        found? ? {poster: @data['posters']['detailed'], year: @year} : @data
+        found? ? {poster: @data['posters']['detailed']} : @data
       end
 
       private

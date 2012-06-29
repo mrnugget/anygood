@@ -1,6 +1,6 @@
 module AnyGood
   class Movie
-    attr_accessor :name, :ratings, :info
+    attr_accessor :name, :year, :ratings, :info
 
     def initialize(attributes = {})
       attributes.each do |k, v|
@@ -16,6 +16,7 @@ module AnyGood
     def as_json(options={})
       JSON.pretty_generate({
         name: @name.sub(/\+/, ' '),
+        year: @year,
         info: @info,
         ratings: @ratings,
         combined_rating: combined_rating

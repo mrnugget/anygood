@@ -65,11 +65,5 @@ describe AnyGood::Clients::RottenTomatoes do
 
       rt_client.info[:poster].should == poster_url
     end
-
-    it 'fetches the year for the movie' do
-      rt_client = AnyGood::Clients::RottenTomatoes.fetch('Inception', 2010)
-
-      rt_client.info[:year].should == 2010
-    end
   end
 end
