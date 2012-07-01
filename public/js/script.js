@@ -65,31 +65,4 @@ $(function () {
     },
     minLength: 2
   });
-
-  var Movie = Backbone.Model.extend({
-    defaults: {
-      name: '',
-      info: '',
-      ratings: {},
-      combined_rating: 0
-    },
-    initialize: function(){
-      console.log('Movie has been initialized');
-    },
-    url: '/api/movies'
-  });
-
-  var MovieView = Backbone.View.extend({
-    template: _.template($('#movie-template').html()),
-
-    initialize: function() {
-      _.bindAll(this, 'render');
-      this.model.on('change', this.render);
-    },
-
-    render: function() {
-      this.$el.html(this.template(this.model.toJSON()));
-      return this;
-    }
-  });
 });
