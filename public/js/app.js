@@ -1,7 +1,18 @@
-_.templateSettings = { 
-  interpolate : /\{\=(.+?)\}\}/g,
+_.templateSettings = {
+  interpolate : /\{\{\=(.+?)\}\}/g,
   evaluate: /\{\{(.+?)\}\}/g
 };
+
+var AnyGoodRouter = Backbone.Router.extend({
+  routes: {
+    "movies/:year/:name" : "showMovie",
+  },
+  showMovie: function(year, name) {
+    AnyGood.getAndDisplayMovie(name, year, AnyGood.$loadingIndicator);
+  }
+});
+
+var router = new AnyGoodRouter();
 
 var Movie = Backbone.Model.extend({
   defaults: {
@@ -42,29 +53,61 @@ var AnyGoodView = Backbone.View.extend({
     this.$nameInput        = this.$form.children('#movie_name_input');
     this.$yearInput        = this.$form.children('#movie_year_input');
     this.$loadingIndicator = this.$('#loading');
+
+
   },
 
   searchMovie: function(event) {
     event.preventDefault();
-    this.$loadingIndicator.show();
+    var url = "movies/" + this.$yearInput.val() + "/" + this.$nameInput.val();
+    router.navigate(url, {trigger: true});
+  },
 
-    var movie = new Movie({
-      name: this.$nameInput.val(),
-      year: this.$yearInput.val()
+  getAndDisplayMovie: function(name, year, $spinner) {
+    $spinner.show();
+
+    var movie = new Movie({name: name, year: year});
+
+    movie.fetch({
+      success: function(movie) {
+        AnyGood.renderMovie(movie);
+        $spinner.hide();
+      }
     });
-
-    movie.fetch();
-
-    this.renderMovie(movie);
-
-    this.$loadingIndicator.hide();
   },
 
   renderMovie: function(movie) {
-    movie.fetch();
     var view = new MovieView({model: movie});
     this.$("#result").html(view.render().el);
   },
 });
 
 var AnyGood = new AnyGoodView;
+
+AnyGood.$nameInput.autocomplete({
+  source: function(request, response) {
+    $.ajax({
+      url: '/api/search',
+      data: {
+        term: request.term
+      },
+      success: function(data) {
+        response($.map(data.movies, function(movie) {
+          return {
+            label: movie.name + ' (' + movie.year + ')',
+            value: movie.name,
+            year: movie.year
+          }
+        }));
+      },
+    });
+  },
+  select: function(event,ui) {
+    $('#movie_year_input').val(ui.item.year);
+    $('#movie_name_input').val(ui.item.value);
+    $(this).parents('form').submit();
+  },
+  minLength: 2
+});
+
+Backbone.history.start()

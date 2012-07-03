@@ -41,18 +41,25 @@
 
   <script type="text/template" id="movie-template">
     <div class="movie">
-      <h3>{= name }} ({= year }})</h3>
+      <h3>{{= name }} ({{= year }})</h3>
       <div class="info">
-        <img src="{= info.poster }}" alt="{= name }}">
+        <img src="{{= info.poster }}" alt="{{= name }}">
       </div>
       <div class="combined-rating">
-        {= combined_rating}}
+        Combined Rating: {{= combined_rating}}
       </div>
       {{ $.each(ratings, function(rating_site, rating) { }}
-        <div class="rating">
-          <h4><a href="{= rating.url}}">{= rating_site}}</a></h4>
-          score: {= rating.score }}
-        </div>
+        {{ if (rating.error) { }}
+          <div class="rating-error">
+            <h4>{{= rating_site}}</h4>
+            {{= rating.error }}
+          </div>
+        {{ } else { }}
+          <div class="rating">
+            <h4><a href="{{= rating.url}}">{{= rating_site}}</a></h4>
+            Rating: {{= rating.score }}
+          </div>
+        {{ } }}
       {{ }); }}
     </div>
   </script>
