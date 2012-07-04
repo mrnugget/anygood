@@ -3,7 +3,7 @@ $(function () {
     function generateHtmlFromMovie(movie) {
       var movieHtml = '';
 
-      movieHtml += '<h3>' + movie.name + ' (' + movie.info.year + ')</h3>';
+      movieHtml += '<h3>' + movie.name + ' (' + movie.year + ')</h3>';
       movieHtml += '<img src="' + movie.info.poster + '">';
       movieHtml += '<h4>Combined Rating: ' + movie.combined_rating + '</h4>';
 
