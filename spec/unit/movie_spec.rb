@@ -33,6 +33,50 @@ describe AnyGood::Movie do
 
       inception.combined_rating.should == 8.875
     end
+
+    it 'ignores ratings with errors' do
+      ratings = {
+        'IMDB' => {error: 'Could not be loaded'},
+        'Rotten Tomatoes' => {score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
+      }
+
+      inception = AnyGood::Movie.new(ratings: ratings)
+
+      inception.combined_rating.should == 8.95
+    end
+
+    it 'ignores ratings that are nil' do
+      ratings = {
+        'IMDB' => {score: nil},
+        'Rotten Tomatoes' => {score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
+      }
+
+      inception = AnyGood::Movie.new(ratings: ratings)
+
+      inception.combined_rating.should == 8.95
+    end
+
+    it 'ignores ratings that are zero' do
+      ratings = {
+        'IMDB' => {score: 0},
+        'Rotten Tomatoes' => {score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
+      }
+
+      inception = AnyGood::Movie.new(ratings: ratings)
+
+      inception.combined_rating.should == 8.95
+    end
+
+    it 'handles empty rating hashes' do
+      ratings = {
+        'IMDB' => {},
+        'Rotten Tomatoes' => {score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
+      }
+
+      inception = AnyGood::Movie.new(ratings: ratings)
+
+      inception.combined_rating.should == 8.95
+    end
   end
 
   describe '#to_json' do
