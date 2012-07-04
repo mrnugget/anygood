@@ -26,11 +26,26 @@ module AnyGood
           end
         end
 
-        def combined_score
-          critics  = @data['ratings']['critics_score'].to_f
-          audience = @data['ratings']['audience_score'].to_f
+        def calculate_combined_score
+          scores = []
 
-          ("%.2f" % (((critics + audience) / 2) * 0.1)).to_f
+          if @data['ratings']['critics_score'] && @data['ratings']['audience_score']
+            scores << @data['ratings']['critics_score'].to_f
+            scores << @data['ratings']['audience_score'].to_f
+          end
+
+          scores.select! {|score| score > 0.0 }
+          scores_sum = scores.inject(:+)
+
+          if scores.any? && scores_sum > 0.0
+            ("%.2f" % ((scores_sum / scores.length) * 0.1)).to_f
+          else
+            0.0
+          end
+        end
+
+        def combined_score
+          @combined_score ||= calculate_combined_score
         end
 
         def query_api

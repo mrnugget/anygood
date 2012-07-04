@@ -16,9 +16,9 @@ describe AnyGood::Clients::RottenTomatoes do
       AnyGood::Clients::RottenTomatoes.fetch('Inception', 2010)
 
       a_request(
-        :get, "http://api.rottentomatoes.com/api/public/v1.0/movies.json"
+        :get, 'http://api.rottentomatoes.com/api/public/v1.0/movies.json'
       ).with(
-        :query => {"apikey" => 'art7wzby22d4vmxfs9zw4qjh', 'q' => 'Inception' }
+        :query => {'apikey' => 'art7wzby22d4vmxfs9zw4qjh', 'q' => 'Inception' }
       ).should have_been_made
     end
 
@@ -54,6 +54,86 @@ describe AnyGood::Clients::RottenTomatoes do
 
       rt_client.rating[:score].should == 8.95
       rt_client.rating[:url].should == 'http://www.rottentomatoes.com/m/inception/'
+    end
+
+    it 'ignores a rating that is 0' do
+      stub_http_request(
+        :get, /api.rottentomatoes.com\/api\/public\/v1\.0\/movies.json/
+      ).to_return(
+        body: '{
+          "total": 1,
+          "movies": [
+            {
+              "title": "Inception",
+              "year": 2010,
+              "ratings": {
+                "critics_rating": "Certified Fresh",
+                "critics_score": 0,
+                "audience_rating": "Upright",
+                "audience_score": 93
+              },
+              "links": {
+                "alternate": "http://www.rottentomatoes.com/m/inception/"
+              }
+            }
+          ]
+        }'
+      )
+
+      rt_client = AnyGood::Clients::RottenTomatoes.fetch('Inception', 2010)
+      rt_client.rating[:score].should == 9.3
+    end
+
+    it 'returns 0 if both ratings are 0' do
+      stub_http_request(
+        :get, /api.rottentomatoes.com\/api\/public\/v1\.0\/movies.json/
+      ).to_return(
+        body: '{
+          "total": 1,
+          "movies": [
+            {
+              "title": "Inception",
+              "year": 2010,
+              "ratings": {
+                "critics_rating": "Certified Fresh",
+                "critics_score": 0,
+                "audience_rating": "Upright",
+                "audience_score": 0
+              },
+              "links": {
+                "alternate": "http://www.rottentomatoes.com/m/inception/"
+              }
+            }
+          ]
+        }'
+      )
+
+      rt_client = AnyGood::Clients::RottenTomatoes.fetch('Inception', 2010)
+      rt_client.rating[:score].should == 0.0
+    end
+
+    it 'does not fail if no ratings are found' do
+      stub_http_request(
+        :get, /api.rottentomatoes.com\/api\/public\/v1\.0\/movies.json/
+      ).to_return(
+        body: '{
+          "total": 1,
+          "movies": [
+            {
+              "title": "Inception",
+              "year": 2010,
+              "ratings": {
+              },
+              "links": {
+                "alternate": "http://www.rottentomatoes.com/m/inception/"
+              }
+            }
+          ]
+        }'
+      )
+
+      rt_client = AnyGood::Clients::RottenTomatoes.fetch('Inception', 2010)
+      rt_client.rating[:score].should == 0.0
     end
   end
 
