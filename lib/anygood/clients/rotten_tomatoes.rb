@@ -5,25 +5,15 @@ module AnyGood
         'Rotten Tomatoes'
       end
 
-      def rating
-        found? ? {score: combined_score, url: @data['links']['alternate']} : @data
-      end
-
       def info
         found? ? {poster: @data['posters']['detailed']} : @data
       end
 
       private
 
-        def fetch_data
-          begin
-            results         = JSON.parse(query_api)
-            matching_movies = results['movies'].select {|movie| movie['year'] == @year}
-
-            matching_movies.first || {error: 'Could not be found'}
-          rescue JSON::ParserError
-            {error: 'Could not be parsed'}
-          end
+        def api_url
+          api_key = 'art7wzby22d4vmxfs9zw4qjh'
+          "http://api.rottentomatoes.com/api/public/v1.0/movies.json?apikey=#{api_key}&q=#{@moviename}"
         end
 
         def calculate_combined_score
@@ -44,18 +34,18 @@ module AnyGood
           end
         end
 
-        def combined_score
-          @combined_score ||= calculate_combined_score
+        def matching_movie(response)
+          matching_movies = response['movies'].select {|movie| movie['year'] == @year}
+
+          matching_movies.first || nil
         end
 
-        def query_api
-          api_key = 'art7wzby22d4vmxfs9zw4qjh'
-          uri     = URI(
-            URI.encode("http://api.rottentomatoes.com/api/public/v1.0/movies.json?apikey=#{api_key}&q=#{@moviename}")
-          )
+        def score
+          @score ||= calculate_combined_score
+        end
 
-          response = Net::HTTP.get_response(uri)
-          response.body
+        def url
+          @url ||= @data['links']['alternate'] || ''
         end
     end
   end
