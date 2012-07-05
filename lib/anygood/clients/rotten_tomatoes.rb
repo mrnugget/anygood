@@ -13,7 +13,7 @@ module AnyGood
 
         def api_url
           api_key = 'art7wzby22d4vmxfs9zw4qjh'
-          "http://api.rottentomatoes.com/api/public/v1.0/movies.json?apikey=#{api_key}&q=#{@moviename}"
+          "http://api.rottentomatoes.com/api/public/v1.0/movies.json?apikey=#{api_key}&q=#{@movie_name}"
         end
 
         def calculate_combined_score

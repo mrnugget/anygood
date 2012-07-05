@@ -3,18 +3,18 @@ require 'net/http'
 module AnyGood
   module Clients
     class Client
-      def self.fetch(moviename, year)
-        new(moviename, year)
+      def self.fetch(movie_name, year)
+        new(movie_name, year)
       end
 
       def rating
         found? ? {score: score, url: url} : @data
       end
 
-      def initialize(moviename, year)
-        @moviename = moviename
-        @year      = year
-        @data      = fetch_data
+      def initialize(movie_name, year)
+        @movie_name = movie_name
+        @year       = year
+        @data       = fetch_data
       end
 
       private

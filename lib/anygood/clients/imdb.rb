@@ -8,11 +8,11 @@ module AnyGood
       private
 
         def api_url
-          "http://www.imdbapi.com/?t=#{@moviename}&y=#{@year}"
+          "http://www.imdbapi.com/?t=#{@movie_name}&y=#{@year}"
         end
 
         def matching_movie(response)
-          if response['Title'].downcase == @moviename.downcase && response['Year'].to_i == @year
+          if response['Title'].downcase == @movie_name.downcase && response['Year'].to_i == @year
             response
           else
             nil
