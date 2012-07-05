@@ -15,7 +15,7 @@ module AnyGood
       Movie.new(name: movie_name, year: year, ratings: ratings, info: info)
     end
 
-    def initialize(cache = REDIS, clients = CLIENTS)
+    def initialize(clients = CLIENTS)
       @cache   = MovieCache.new
       @clients = clients
     end
