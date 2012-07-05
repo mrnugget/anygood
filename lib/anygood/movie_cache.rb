@@ -1,5 +1,5 @@
 module AnyGood
-  class ClientCache
+  class MovieCache
 
     TTL = 14400
 
@@ -18,15 +18,7 @@ module AnyGood
       end
 
       def key_for(type, moviename, clientname)
-        send("#{type.to_s}_key_for", moviename, clientname)
-      end
-
-      def info_key_for(moviename, client_name)
-        "movieinfo:#{URI.encode(moviename)}:#{URI.encode(client_name)}"
-      end
-
-      def rating_key_for(moviename, client_name)
-        "movierating:#{URI.encode(moviename)}:#{URI.encode(client_name)}"
+        "movie#{type.to_s}:#{URI.encode(moviename)}:#{URI.encode(clientname)}"
       end
 
       def set(type, moviename, clientname, payload)

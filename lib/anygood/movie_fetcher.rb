@@ -16,7 +16,7 @@ module AnyGood
     end
 
     def initialize(cache = REDIS, clients = CLIENTS)
-      @cache   = ClientCache.new
+      @cache   = MovieCache.new
       @clients = clients
     end
 
@@ -27,13 +27,10 @@ module AnyGood
       end
 
       def ratings_for(moviename, year)
-        ratings = {}
-
-        @clients.each do |client|
+        @clients.inject({}) do |ratings, client|
           ratings[client.name] = fetch_from_cache_or_client(:rating, client, moviename, year)
+          ratings
         end
-
-        ratings
       end
 
       def fetch_from_cache_or_client(type, client, moviename, year)
