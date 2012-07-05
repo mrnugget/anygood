@@ -1,6 +1,7 @@
 require 'anygood/clients/client'
 require 'anygood/clients/imdb'
 require 'anygood/clients/rotten_tomatoes'
+require 'anygood/client_cache'
 require 'anygood/movie'
 require 'anygood/movie_matcher'
 require 'anygood/movie_fetcher'

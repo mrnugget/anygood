@@ -2,7 +2,6 @@ module AnyGood
   class MovieFetcher
 
     CLIENTS = [Clients::IMDB, Clients::RottenTomatoes]
-    CACHE_TTL = 14400
 
     def self.fetch_by_name_and_year(moviename, year)
       new.fetch_by_name_and_year(moviename, year)
@@ -17,7 +16,7 @@ module AnyGood
     end
 
     def initialize(cache = REDIS, clients = CLIENTS)
-      @cache   = cache
+      @cache   = ClientCache.new
       @clients = clients
     end
 
@@ -38,30 +37,9 @@ module AnyGood
       end
 
       def fetch_from_cache_or_client(type, client, moviename, year)
-        key = send("#{type.to_s}_key_for", moviename, client.name)
-        get_from_cache(key) || fetch_and_save_to_cache(type, client, moviename, year)
-      end
-
-      def fetch_and_save_to_cache(type, client, moviename, year)
-        result = client.fetch(moviename, year).send(type)
-        key    = send("#{type.to_s}_key_for", moviename, client.name)
-
-        @cache.setex(key, CACHE_TTL, result.to_json)
-
-        result
-      end
-
-      def get_from_cache(key)
-        cached = @cache.get(key)
-        cached ? JSON.parse(cached, symbolize_names: true) : cached
-      end
-
-      def info_key_for(moviename, client_name)
-        "movieinfo:#{URI.encode(moviename)}:#{URI.encode(client_name)}"
-      end
-
-      def rating_key_for(moviename, client_name)
-        "movierating:#{URI.encode(moviename)}:#{URI.encode(client_name)}"
+        @cache.get(type, moviename, client.name) do
+          client.fetch(moviename, year).send(type)
+        end
       end
   end
 end
