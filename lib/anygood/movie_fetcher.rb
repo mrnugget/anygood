@@ -1,6 +1,5 @@
 module AnyGood
   class MovieFetcher
-
     attr_accessor :cache, :rating_clients, :info_client
 
     def initialize(attributes = {})
@@ -49,8 +48,7 @@ module AnyGood
       end
 
       def get_or_cache(type, movie_name, client_name)
-        cached = self.cache.get(type, movie_name, client_name)
-        if cached
+        if cached = self.cache.get(type, movie_name, client_name)
           cached
         else
           payload = yield
