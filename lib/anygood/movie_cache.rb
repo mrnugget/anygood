@@ -3,7 +3,7 @@ module AnyGood
 
     TTL = 14400
 
-    def get(type, movie_name, client_name)
+    def get_or_new(type, movie_name, client_name)
       key    = key_for(type, movie_name, client_name)
       cached = get_and_parse(key)
 

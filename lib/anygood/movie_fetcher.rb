@@ -7,22 +7,22 @@ module AnyGood
       new.fetch_by_name_and_year(movie_name, year)
     end
 
-    def fetch_by_name_and_year(movie_name, year)
-      ratings = ratings_for(movie_name, year)
-      info    = info_for(Clients::RottenTomatoes, movie_name, year)
-
-      MovieMatcher.new.incr_score_for(name: movie_name, year: year)
-      Movie.new(name: movie_name, year: year, ratings: ratings, info: info)
-    end
-
     def initialize(clients = CLIENTS)
       @cache   = MovieCache.new
       @clients = clients
     end
 
+    def fetch_by_name_and_year(movie_name, year)
+      ratings = ratings_for(movie_name, year)
+      info    = info_for(movie_name, year, Clients::RottenTomatoes)
+
+      MovieMatcher.new.incr_score_for(name: movie_name, year: year)
+      Movie.new(name: movie_name, year: year, ratings: ratings, info: info)
+    end
+
     private
 
-      def info_for(client, movie_name, year)
+      def info_for(movie_name, year, client)
         fetch_from_cache_or_client(:info, client, movie_name, year)
       end
 
@@ -34,7 +34,7 @@ module AnyGood
       end
 
       def fetch_from_cache_or_client(type, client, movie_name, year)
-        @cache.get(type, movie_name, client.name) do
+        @cache.get_or_new(type, movie_name, client.name) do
           client.fetch(movie_name, year).send(type)
         end
       end
