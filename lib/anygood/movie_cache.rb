@@ -3,11 +3,14 @@ module AnyGood
 
     TTL = 14400
 
-    def get_or_new(type, movie_name, client_name)
-      key    = key_for(type, movie_name, client_name)
-      cached = get_and_parse(key)
+    def get(type, movie_name, client_name)
+      key = key_for(type, movie_name, client_name)
+      get_and_parse(key)
+    end
 
-      cached ? cached : set(type, movie_name, client_name, yield)
+    def write(type, movie_name, client_name, payload)
+      key = key_for(type, movie_name, client_name)
+      REDIS.setex(key, TTL, payload.to_json)
     end
 
     private
@@ -19,12 +22,6 @@ module AnyGood
 
       def key_for(type, movie_name, client_name)
         "movie#{type.to_s}:#{URI.encode(movie_name)}:#{URI.encode(client_name)}"
-      end
-
-      def set(type, movie_name, client_name, payload)
-        key = key_for(type, movie_name, client_name)
-        REDIS.setex(key, TTL, payload.to_json)
-        payload
       end
   end
 end
