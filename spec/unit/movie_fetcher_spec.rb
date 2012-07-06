@@ -5,10 +5,12 @@ describe AnyGood::MovieFetcher do
     before(:each) do
       stub_rottentomatoes_query('Inception', 'rt_inception')
       stub_imdb_query('Inception', 2010, 'imdb_inception')
+
+      @movie_fetcher = AnyGood::MovieFetcher.new
     end
 
     it 'returns a Movie object with attributes fetched from different clients' do
-      movie = AnyGood::MovieFetcher.fetch_by_name_and_year('Inception', 2010)
+      movie = @movie_fetcher.fetch_by_name_and_year('Inception', 2010)
 
       movie.should be_a(AnyGood::Movie)
       movie.ratings['IMDB'][:score].should == 8.8
@@ -18,7 +20,7 @@ describe AnyGood::MovieFetcher do
     it 'returns an appropriate message if one of the clients response could not be parsed' do
       stub_rottentomatoes_query('Inception', 'json_parse_error')
 
-      movie = AnyGood::MovieFetcher.fetch_by_name_and_year('Inception', 2010)
+      movie = @movie_fetcher.fetch_by_name_and_year('Inception', 2010)
 
       movie.ratings['Rotten Tomatoes'][:error].should == 'Could not be parsed'
     end
@@ -26,7 +28,7 @@ describe AnyGood::MovieFetcher do
     it 'returns an appropriate message if the info from RT could not be parsed' do
       stub_rottentomatoes_query('Inception', 'json_parse_error')
 
-      movie = AnyGood::MovieFetcher.fetch_by_name_and_year('Inception', 2010)
+      movie = @movie_fetcher.fetch_by_name_and_year('Inception', 2010)
 
       movie.info[:error].should == 'Could not be parsed'
     end
@@ -52,7 +54,7 @@ describe AnyGood::MovieFetcher do
           "movierating:#{encoded_movie_name}:#{encoded_rt_name}"
         )
 
-        AnyGood::MovieFetcher.fetch_by_name_and_year('Inception', 2010)
+        @movie_fetcher.fetch_by_name_and_year('Inception', 2010)
       end
 
       context 'ratings are not in the cache' do
@@ -68,7 +70,7 @@ describe AnyGood::MovieFetcher do
             {score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}.to_json
           )
 
-          AnyGood::MovieFetcher.fetch_by_name_and_year('Inception', 2010)
+          @movie_fetcher.fetch_by_name_and_year('Inception', 2010)
         end
       end
 
@@ -81,7 +83,7 @@ describe AnyGood::MovieFetcher do
 
           AnyGood::Clients::IMDB.should_not_receive(:fetch)
 
-          AnyGood::MovieFetcher.fetch_by_name_and_year('Inception', 2010)
+          @movie_fetcher.fetch_by_name_and_year('Inception', 2010)
         end
 
         it 'fetches the movieinfo from RT even if the RT rating is in cache' do
@@ -94,7 +96,7 @@ describe AnyGood::MovieFetcher do
             stub(:rt).as_null_object
           }
 
-          AnyGood::MovieFetcher.fetch_by_name_and_year('Inception', 2010)
+          @movie_fetcher.fetch_by_name_and_year('Inception', 2010)
         end
       end
 
@@ -112,7 +114,7 @@ describe AnyGood::MovieFetcher do
             stub(:rt).as_null_object
           }
 
-          AnyGood::MovieFetcher.fetch_by_name_and_year('Inception', 2010)
+          @movie_fetcher.fetch_by_name_and_year('Inception', 2010)
         end
       end
     end

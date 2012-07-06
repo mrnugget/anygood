@@ -31,7 +31,7 @@ module AnyGood
     get '/api/movies/:year/:name' do
       content_type :json
 
-      movie = MovieFetcher.fetch_by_name_and_year(
+      movie = MovieFetcher.new.fetch_by_name_and_year(
         params[:name], params[:year].to_i
       )
 
