@@ -8,7 +8,8 @@ var AnyGoodRouter = Backbone.Router.extend({
     "movies/:year/:name" : "showMovie",
   },
   showMovie: function(year, name) {
-    AnyGood.getAndDisplayMovie(name, year, AnyGood.$loadingIndicator);
+    var movieName = name.split('_').join(' ');
+    AnyGood.getAndDisplayMovie(movieName, year, AnyGood.$loadingIndicator);
   }
 });
 
@@ -53,13 +54,11 @@ var AnyGoodView = Backbone.View.extend({
     this.$nameInput        = this.$form.children('#movie_name_input');
     this.$yearInput        = this.$form.children('#movie_year_input');
     this.$loadingIndicator = this.$('#loading');
-
-
   },
 
   searchMovie: function(event) {
     event.preventDefault();
-    var url = "movies/" + this.$yearInput.val() + "/" + this.$nameInput.val();
+    var url = "movies/" + this.$yearInput.val() + "/" + this.$nameInput.val().split(' ').join('_');
     router.navigate(url, {trigger: true});
   },
 
