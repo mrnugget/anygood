@@ -6,7 +6,7 @@ body {
 #anygood {
   color: #5D5D5D;
   font-family: "Lucida Grande","Helvetica Neue",Helvetica,Arial,sans-serif;
-  width: 900px;
+  max-width: 56.25em;
   margin: 0 auto;
 }
 header {
