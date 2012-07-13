@@ -17,6 +17,7 @@
       <form action="/api/movies" id="search_movie">
         <input id="movie_name_input" type="text" name="movie_name_input" placeholder="Enter the name of a movie here..." size="50">
         <input id="movie_year_input" type="hidden" name="movie_year_input">
+        <input type="submit" value="Search" class="button">
       </form>
 
       <div id="loading" class="hidden">
@@ -33,6 +34,21 @@
       Fork this project on <a href="http://www.github.com/mrnugget/anygood">GitHub.com</a>
     </footer>
   </div>
+
+  <script type="text/template" id="search-result-template">
+    <div class="search-result">
+      <h3>Search Results:</h3>
+      {{ if (movies.length > 0) { }}
+        <ul>
+        {{ $.each(movies, function(index, movie) { }}
+          <li><a href="#movies/{{= movie.year }}/{{= movie.name.split(' ').join('_') }}" class="search-result">{{= movie.name}} ({{=movie.year}})</a></li>
+        {{ }); }}
+        </ul>
+      {{ } else { }}
+        <p>Sorry! Couldn't find any matching movies, mate :(</p>
+      {{ } }}
+    </div>
+  </script>
 
   <script type="text/template" id="movie-template">
     <div class="movie">

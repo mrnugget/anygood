@@ -8,10 +8,14 @@ var AnyGood = {};
 AnyGood.Router = Backbone.Router.extend({
   routes: {
     "movies/:year/:name" : "showMovie",
+    "search/:term" : "searchMovie"
   },
   showMovie: function(year, name) {
     var movieName = name.split('_').join(' ');
     AnyGood.mainView.getAndDisplayMovie(movieName, year, AnyGood.mainView.$loadingIndicator);
+  },
+  searchMovie: function(term) {
+    AnyGood.mainView.getAndDisplaySearchResults(term);
   }
 });
 
@@ -26,6 +30,26 @@ AnyGood.Movie = Backbone.Model.extend({
   url: function () {
     return '/api/movies/' + this.get('year') + '/' + this.get('name');
   }
+});
+
+AnyGood.SearchResult = Backbone.Model.extend({
+  defaults: {
+    movies: []
+  }
+});
+
+AnyGood.SearchResultView = Backbone.View.extend({
+  template: _.template($('#search-result-template').html()),
+
+  initialize: function() {
+    _.bindAll(this, 'render');
+    this.model.on('change', this.render);
+  },
+
+  render: function() {
+    this.$el.html(this.template(this.model.toJSON()));
+    return this;
+  },
 });
 
 AnyGood.MovieView = Backbone.View.extend({
@@ -58,8 +82,29 @@ AnyGood.MainView = Backbone.View.extend({
 
   searchMovie: function(event) {
     event.preventDefault();
-    var url = "movies/" + this.$yearInput.val() + "/" + this.$nameInput.val().split(' ').join('_');
-    AnyGood.router.navigate(url, {trigger: true});
+    if (this.$yearInput.val() != '') {
+      var url = "movies/" + this.$yearInput.val() + "/" + this.$nameInput.val().split(' ').join('_');
+      this.$yearInput.val('');
+      this.$nameInput.val('');
+      AnyGood.router.navigate(url, {trigger: true});
+    } else {
+      var url = "search/" + this.$nameInput.val();
+      AnyGood.router.navigate(url, {trigger: true});
+    }
+  },
+
+  getAndDisplaySearchResults: function(term) {
+    $.ajax({
+      url: '/api/search',
+      data: {
+        term: term
+      },
+      success: function(data) {
+        var searchResult     = new AnyGood.SearchResult({movies: data.movies});
+        var searchResultView = new AnyGood.SearchResultView({model: searchResult});
+        $("#result").html(searchResultView.render().el);
+      },
+    });
   },
 
   getAndDisplayMovie: function(name, year, $spinner) {
