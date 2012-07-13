@@ -7,30 +7,26 @@
   <title>Any good? - Check if a movie is any good!</title>
 </head>
 <body>
+  <a href="https://github.com/mrnugget/anygood"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
   <div id="anygood">
     <header>
       <h1>Any good?</h1>
-      <h2>Check if a movie is any good!</h2>
     </header>
 
     <div id="main">
       <form action="/api/movies" id="search_movie">
-        <label for="movie_name_input">Name:</label>
-        <input id="movie_name_input" type="text" name="movie_name_input">
+        <input id="movie_name_input" type="text" name="movie_name_input" placeholder="Enter the name of a movie here..." size="50">
         <input id="movie_year_input" type="hidden" name="movie_year_input">
-        <input type="submit" value="Search">
+        <input type="submit" value="Search" class="button">
       </form>
 
       <div id="loading" style="display: none;">
-        <img src="images/spinner.gif" alt="Loading...">
+        Loading...
       </div>
 
       <div id="result">
 
       </div>
-    </div>
-
-    <div class='movie'>
     </div>
 
     <footer>
@@ -45,22 +41,24 @@
       <div class="info">
         <img src="{{= info.poster }}" alt="{{= name }}">
       </div>
-      <div class="combined-rating">
-        Combined Rating: {{= combined_rating}}
+      <div class="ratings">
+        <div class="combined-rating">
+          Combined Rating: {{= combined_rating}}
+        </div>
+        {{ $.each(ratings, function(rating_site, rating) { }}
+          {{ if (rating.error) { }}
+            <div class="rating-error">
+              <h4>{{= rating_site}}</h4>
+              {{= rating.error }}
+            </div>
+          {{ } else { }}
+            <div class="rating">
+              <h4><a href="{{= rating.url}}">{{= rating_site}}</a></h4>
+              Rating: {{= rating.score }}
+            </div>
+          {{ } }}
+        {{ }); }}
       </div>
-      {{ $.each(ratings, function(rating_site, rating) { }}
-        {{ if (rating.error) { }}
-          <div class="rating-error">
-            <h4>{{= rating_site}}</h4>
-            {{= rating.error }}
-          </div>
-        {{ } else { }}
-          <div class="rating">
-            <h4><a href="{{= rating.url}}">{{= rating_site}}</a></h4>
-            Rating: {{= rating.score }}
-          </div>
-        {{ } }}
-      {{ }); }}
     </div>
   </script>
 

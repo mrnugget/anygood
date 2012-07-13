@@ -1,3 +1,86 @@
+@import url(http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:700);
+
+body {
+  background: hsl(0, 0%, 95%);
+}
+#anygood {
+  color: #5D5D5D;
+  font-family: "Lucida Grande","Helvetica Neue",Helvetica,Arial,sans-serif;
+  width: 900px;
+  margin: 0 auto;
+}
+header {
+  font-family: 'Yanone Kaffeesatz', sans-serif;
+  padding: 0.5em;
+  color: hsl(0, 40%, 40%);
+  font-size: 3em;
+}
+h1 {
+  margin: 0;
+  text-align: center;
+}
+a {
+  color: hsl(0, 40%, 40%);
+}
+a:hover { 
+  color: black;
+}
+#search_movie {
+  margin: 1em auto;
+  text-align: center;
+}
+#movie_name_input {
+  font-size: 1.5em;
+  border: none;
+  padding: 0.5em;
+  -webkit-appearance: none;
+}
+#search_movie input[type=submit] {
+  font-size: 1.5em;
+}
+.button {
+  font-size: 2em;
+  border: none;
+  padding: 0.5em;
+  -webkit-appearance: none;
+}
+.button:hover {
+  background: hsl(0, 40%, 40%);
+  -webkit-transition: all 0.3s ease-in;
+}
+#loading {
+  text-align: center;
+}
+#result {
+  padding: 1em;
+}
+.movie:before,
+.movie:after {
+    content:"";
+    display:table;
+}
+.movie:after {
+    clear:both;
+}
+.movie {
+    zoom:1; /* For IE 6/7 (trigger hasLayout) */
+}
+.movie h3 {
+  font-family: 'Yanone Kaffeesatz', sans-serif;
+  color: hsl(0, 40%, 40%);
+  font-size: 2em;
+}
+.movie .info {
+  float: left;
+}
+.movie .ratings {
+  margin-left: 200px;
+}
+.movie .combined-rating {
+  font-size: 1.4em;
+  font-weight: bold;
+}
 footer {
   margin-top: 3em;
+  text-align: center;
 }
