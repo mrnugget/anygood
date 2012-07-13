@@ -55,7 +55,14 @@ a:hover {
 }
 
 /* Movie */
+.movie {
+  background: white;
+  padding: 1em;
+  -webkit-transition: all 0.3s ease-in;
+}
 .movie h3 {
+  margin: 0;
+  margin-bottom: 0.3em;
   font-family: 'Yanone Kaffeesatz', sans-serif;
   color: hsl(0, 40%, 40%);
   font-size: 2em;
