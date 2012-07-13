@@ -10,6 +10,7 @@ header {
   font-size: 3em;
 }
 footer {
+  font-size: 0.8em;
   margin-top: 3em;
   text-align: center;
 }
@@ -36,8 +37,10 @@ a:hover {
 }
 #movie_name_input {
   font-size: 1.5em;
+  background: white url(http://i.stackoverflow.com/Content/Img/search.png) no-repeat scroll left center;
   border: none;
   padding: 0.5em;
+  width: 24em;
   -webkit-appearance: none;
 }
 #search_movie input[type=submit] {
@@ -97,6 +100,7 @@ a:hover {
 
 .button {
   font-size: 2em;
+  background: #C0C0C0;
   border: none;
   padding: 0.5em;
   -webkit-appearance: none;
@@ -109,6 +113,9 @@ a:hover {
 
 /* jquery-ui styling */
 
+.ui-autocomplete-loading {
+  background: white url(/images/autocomplete-spinner.gif) no-repeat 95% !important;;
+}
 .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { border: 0px; background: #e6e6e6 url(images/ui-bg_glass_75_e6e6e6_1x400.png) 50% 50% repeat-x; font-weight: normal; color: #555555; }
 .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active { border: 0px; background: #ffffff url(images/ui-bg_glass_65_ffffff_1x400.png) 50% 50% repeat-x; font-weight: normal; color: #212121; }
 .ui-state-hover,
