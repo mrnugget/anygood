@@ -42,7 +42,7 @@
       </div>
       <div class="ratings">
         <div class="combined-rating">
-          Combined Rating: {{= combined_rating}}
+          Combined Rating: {{= combined_rating}}/10
         </div>
         {{ $.each(ratings, function(rating_site, rating) { }}
           {{ if (rating.error) { }}
@@ -53,7 +53,7 @@
           {{ } else { }}
             <div class="rating">
               <h4><a href="{{= rating.url}}">{{= rating_site}}</a></h4>
-              Rating: {{= rating.score }}
+              Rating: {{= rating.score }}/10
             </div>
           {{ } }}
         {{ }); }}
