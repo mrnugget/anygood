@@ -49,6 +49,7 @@ a:hover {
 }
 .button:hover {
   background: hsl(0, 40%, 40%);
+  color: hsl(0, 0%, 95%);
   -webkit-transition: all 0.3s ease-in;
 }
 #loading {
