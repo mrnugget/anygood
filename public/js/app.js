@@ -109,8 +109,11 @@ $(function(AnyGood) {
       $('#movie_year_input').val(ui.item.year);
       $('#movie_name_input').val(ui.item.value);
       $(this).parents('form').submit();
+      $(this).blur();
     },
     minLength: 2
+  }).focus(function() {
+    $(this).val('');
   });
 
   Backbone.history.start()
