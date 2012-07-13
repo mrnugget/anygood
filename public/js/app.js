@@ -63,14 +63,14 @@ AnyGood.MainView = Backbone.View.extend({
   },
 
   getAndDisplayMovie: function(name, year, $spinner) {
-    $spinner.show();
+    $spinner.removeClass('hidden');
 
     var movie = new AnyGood.Movie({name: name, year: year});
 
     movie.fetch({
       success: function(movie) {
         AnyGood.mainView.renderMovie(movie);
-        $spinner.hide();
+        $spinner.addClass('hidden');
       }
     });
   },

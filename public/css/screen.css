@@ -25,6 +25,9 @@ a {
 a:hover { 
   color: black;
 }
+.hidden {
+  visibility: hidden;
+}
 #search_movie {
   margin: 1em auto;
   text-align: center;
