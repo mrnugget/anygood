@@ -25,7 +25,6 @@ AnyGood.Movie = Backbone.Model.extend({
     year: 0,
     info: '',
     ratings: {},
-    ignoredRatings: [],
     combined_rating: 0
   },
   url: function () {
@@ -33,15 +32,18 @@ AnyGood.Movie = Backbone.Model.extend({
   },
   getScoresToCalculate: function() {
     var scoresToCalculate = [];
-    var ignoredRatings    = this.get('ignoredRatings');
+
     $.each(this.get('ratings'), function(ratingSite, rating) {
-      if ($.inArray(ratingSite, ignoredRatings) < 0) {
+      if (rating.ignored === false) {
+        scoresToCalculate.push(rating.score);
+      }
+      if (rating.ignored === undefined) {
         scoresToCalculate.push(rating.score);
       }
     });
     return scoresToCalculate;
   },
-  
+
   calculateCombinedRating: function() {
     var scores         = this.getScoresToCalculate();
     var scoresSum      = 0;
@@ -58,21 +60,20 @@ AnyGood.Movie = Backbone.Model.extend({
   },
 
   ignoreRating: function(ratingSite) {
-    var ignoredRatings = this.get('ignoredRatings');
+    var ratings                    = this.get('ratings');
+    ratings[ratingSite]['ignored'] = true;
 
-    ignoredRatings.push(ratingSite);
+    this.set('ratings', ratings);
 
-    this.set('ignoredRatings', ignoredRatings);
     this.calculateCombinedRating();
   },
 
   unIgnoreRating: function(ratingSite) {
-    var ignoredRatings = this.get('ignoredRatings');
-    var index          = ignoredRatings.indexOf(ratingSite);
+    var ratings                    = this.get('ratings');
+    ratings[ratingSite]['ignored'] = false;
 
-    if (index != -1) ignoredRatings.splice(index, 1);
+    this.set('ratings', ratings);
 
-    this.set('ignoredRatings', ignoredRatings);
     this.calculateCombinedRating();
   }
 });
