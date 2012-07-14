@@ -25,10 +25,55 @@ AnyGood.Movie = Backbone.Model.extend({
     year: 0,
     info: '',
     ratings: {},
+    ignoredRatings: [],
     combined_rating: 0
   },
   url: function () {
     return '/api/movies/' + this.get('year') + '/' + this.get('name');
+  },
+  getScoresToCalculate: function() {
+    var scoresToCalculate = [];
+    var ignoredRatings    = this.get('ignoredRatings');
+    $.each(this.get('ratings'), function(ratingSite, rating) {
+      if ($.inArray(ratingSite, ignoredRatings) < 0) {
+        scoresToCalculate.push(rating.score);
+      }
+    });
+    return scoresToCalculate;
+  },
+  
+  calculateCombinedRating: function() {
+    var scores         = this.getScoresToCalculate();
+    var scoresSum      = 0;
+    var combinedRating = 0;
+
+    for (var i = 0; i < scores.length; i++) {
+      scoresSum += scores[i];
+    }
+    if (scores.length > 0) {
+      combinedRating = scoresSum / scores.length;
+    }
+    console.log("COMBINED RATING:" + combinedRating);
+    // this.set('combined_rating', combinedRating);
+  },
+
+  ignoreRating: function(ratingSite) {
+    var ignoredRatings = this.get('ignoredRatings');
+
+    ignoredRatings.push(ratingSite);
+
+    this.set('ignoredRatings', ignoredRatings);
+    this.calculateCombinedRating();
+  },
+
+  unIgnoreRating: function(ratingSite) {
+    var ignoredRatings = this.get('ignoredRatings');
+    var index          = ignoredRatings.indexOf(ratingSite);
+
+    if (index != -1) ignoredRatings.splice(index, 1);
+
+    this.set('ignoredRatings', ignoredRatings);
+    this.calculateCombinedRating();
   }
 });
 
@@ -55,6 +100,10 @@ AnyGood.SearchResultView = Backbone.View.extend({
 AnyGood.MovieView = Backbone.View.extend({
   template: _.template($('#movie-template').html()),
 
+  events: {
+    'click .rating': 'toggleRatingIgnore'
+  },
+
   initialize: function() {
     _.bindAll(this, 'render');
     this.model.on('change', this.render);
@@ -63,6 +112,25 @@ AnyGood.MovieView = Backbone.View.extend({
   render: function() {
     this.$el.html(this.template(this.model.toJSON()));
     return this;
+  },
+
+  toggleRatingIgnore: function(event) {
+    event.preventDefault;
+
+    var rating     = $(event.target);
+    var ratingSite = rating.attr('data-rating-site');
+
+    if (rating.attr('data-ignored') === 'false') {
+      rating.attr('data-ignored', 'true');
+      rating.addClass('ignored');
+
+      this.model.ignoreRating(ratingSite);
+    } else {
+      rating.attr('data-ignored', 'false');
+      rating.removeClass('ignored');
+
+      this.model.unIgnoreRating(ratingSite);
+    }
   }
 });
 

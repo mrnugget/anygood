@@ -81,6 +81,10 @@ a:hover {
   font-weight: bold;
 }
 
+.movie .ignored {
+  background: black;
+}
+
 /* Utility classes and styling */
 .hidden {
   visibility: hidden;
