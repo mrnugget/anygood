@@ -86,11 +86,10 @@ AnyGood.MainView = Backbone.View.extend({
       var url = "movies/" + this.$yearInput.val() + "/" + this.$nameInput.val().split(' ').join('_');
       this.$yearInput.val('');
       this.$nameInput.val('');
-      AnyGood.router.navigate(url, {trigger: true});
     } else {
       var url = "search/" + this.$nameInput.val();
-      AnyGood.router.navigate(url, {trigger: true});
     }
+    AnyGood.router.navigate(url, {trigger: true});
   },
 
   getAndDisplaySearchResults: function(term) {
@@ -115,15 +114,23 @@ AnyGood.MainView = Backbone.View.extend({
     movie.fetch({
       success: function(movie) {
         AnyGood.mainView.renderMovie(movie);
-        $spinner.addClass('hidden');
+      },
+      error: function() {
+        AnyGood.mainView.renderError();
       }
     });
+    $spinner.addClass('hidden');
   },
 
   renderMovie: function(movie) {
     var view = new AnyGood.MovieView({model: movie});
     this.$("#result").html(view.render().el);
   },
+
+  renderError: function() {
+    var template = _.template($('#500-template').html());
+    this.$("#result").html(template());
+  }
 });
 
 
