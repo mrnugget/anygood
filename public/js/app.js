@@ -114,12 +114,13 @@ AnyGood.MainView = Backbone.View.extend({
     movie.fetch({
       success: function(movie) {
         AnyGood.mainView.renderMovie(movie);
+        $spinner.addClass('hidden');
       },
       error: function() {
         AnyGood.mainView.renderError();
+        $spinner.addClass('hidden');
       }
     });
-    $spinner.addClass('hidden');
   },
 
   renderMovie: function(movie) {
