@@ -1,5 +1,5 @@
 _.templateSettings = {
-  interpolate : /\{\{\=(.+?)\}\}/g,
+  interpolate: /\{\{\=(.+?)\}\}/g,
   evaluate: /\{\{(.+?)\}\}/g
 };
 
@@ -93,7 +93,7 @@ AnyGood.MovieView = Backbone.View.extend({
   template: _.template($('#movie-template').html()),
 
   events: {
-    'click .rating': 'toggleRatingIgnore'
+    'click .ignore-button': 'toggleRatingIgnore'
   },
 
   initialize: function() {
@@ -109,11 +109,11 @@ AnyGood.MovieView = Backbone.View.extend({
   toggleRatingIgnore: function(event) {
     event.preventDefault();
 
-    var $rating    = $(event.target);
+    var $button    = $(event.target);
+    var $rating    = $button.parents('.rating');
     var ratingSite = $rating.attr('data-rating-site');
 
     this.model.toggleRatingIgnoreStatus(ratingSite);
-    $rating.toggleClass('ignored');
   }
 });
 

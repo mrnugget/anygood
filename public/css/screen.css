@@ -82,9 +82,8 @@ a:hover {
 }
 .movie .ignore-button {
   font-size: 0.5em;
-  color: hsla(0, 0%, 36%, 0.5);
+  color: hsla(0, 0%, 36%, 0.4);
   float: right;
-  display: none;
 }
 
 .movie .ignored {
