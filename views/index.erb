@@ -82,9 +82,12 @@
               {{= rating.error }}
             </div>
           {{ } else { }}
-            <div class="rating" data-rating-site="{{= rating_site}}" data-ignored="false">
-              <h4><a href="{{= rating.url}}">{{= rating_site}}</a></h4>
+            <div class="rating {{= rating.ignored === true ? 'ignored' : '' }}" data-rating-site="{{= rating_site}}">
+              <h4>
+                <a href="{{= rating.url}}">{{= rating_site}}</a>
+              </h4>
               Rating: {{= rating.score }}/10
+              <span class="ignore-button">Ignore this site</span>
             </div>
           {{ } }}
         {{ }); }}

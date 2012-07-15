@@ -32,15 +32,13 @@ AnyGood.Movie = Backbone.Model.extend({
   },
   getScoresToCalculate: function() {
     var scoresToCalculate = [];
+    var ratings           = this.get('ratings');
 
-    $.each(this.get('ratings'), function(ratingSite, rating) {
-      if (rating.ignored === false) {
-        scoresToCalculate.push(rating.score);
+    for (var ratingSite in ratings) {
+      if (ratings[ratingSite].ignored === false || ratings[ratingSite].ignored === undefined) {
+        scoresToCalculate.push(ratings[ratingSite].score);
       }
-      if (rating.ignored === undefined) {
-        scoresToCalculate.push(rating.score);
-      }
-    });
+    }
     return scoresToCalculate;
   },
 
@@ -55,25 +53,18 @@ AnyGood.Movie = Backbone.Model.extend({
     if (scores.length > 0) {
       combinedRating = scoresSum / scores.length;
     }
-    console.log("COMBINED RATING:" + combinedRating);
-    // this.set('combined_rating', combinedRating);
+    this.set('combined_rating', combinedRating);
   },
 
-  ignoreRating: function(ratingSite) {
-    var ratings                    = this.get('ratings');
-    ratings[ratingSite]['ignored'] = true;
+  toggleRatingIgnoreStatus: function(ratingSite) {
+    var ratings = this.get('ratings');
 
+    if (ratings[ratingSite] && ratings[ratingSite].ignored === true) {
+      ratings[ratingSite].ignored = false;
+    } else {
+      ratings[ratingSite].ignored = true;
+    }
     this.set('ratings', ratings);
-
-    this.calculateCombinedRating();
-  },
-
-  unIgnoreRating: function(ratingSite) {
-    var ratings                    = this.get('ratings');
-    ratings[ratingSite]['ignored'] = false;
-
-    this.set('ratings', ratings);
-
     this.calculateCombinedRating();
   }
 });
@@ -116,22 +107,13 @@ AnyGood.MovieView = Backbone.View.extend({
   },
 
   toggleRatingIgnore: function(event) {
-    event.preventDefault;
+    event.preventDefault();
 
-    var rating     = $(event.target);
-    var ratingSite = rating.attr('data-rating-site');
+    var $rating    = $(event.target);
+    var ratingSite = $rating.attr('data-rating-site');
 
-    if (rating.attr('data-ignored') === 'false') {
-      rating.attr('data-ignored', 'true');
-      rating.addClass('ignored');
-
-      this.model.ignoreRating(ratingSite);
-    } else {
-      rating.attr('data-ignored', 'false');
-      rating.removeClass('ignored');
-
-      this.model.unIgnoreRating(ratingSite);
-    }
+    this.model.toggleRatingIgnoreStatus(ratingSite);
+    $rating.toggleClass('ignored');
   }
 });
 
