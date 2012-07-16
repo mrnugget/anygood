@@ -20,10 +20,6 @@
         <input type="submit" value="Search" class="button">
       </form>
 
-      <div id="loading" class="hidden">
-        Loading...
-      </div>
-
       <div id="result">
 
       </div>
@@ -48,6 +44,12 @@
       <h3>Sorry!</h3>
       Something went wrong!
     </div>
+  </script>
+
+  <script type="text/template" id="loading-template">
+      <div class="loading">
+        Loading movie information and ratings...
+      </div>
   </script>
 
   <script type="text/template" id="search-result-template">

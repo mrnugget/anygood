@@ -89,6 +89,19 @@ AnyGood.SearchResultView = Backbone.View.extend({
   },
 });
 
+AnyGood.LoadingMovieView = Backbone.View.extend({
+  template: _.template($('#loading-template').html()),
+
+  initialize: function() {
+    _.bindAll(this, 'render');
+  },
+
+  render: function() {
+    this.$el.html(this.template(this.model.toJSON()));
+    return this;
+  },
+});
+
 AnyGood.MovieView = Backbone.View.extend({
   template: _.template($('#movie-template').html()),
 
@@ -128,7 +141,6 @@ AnyGood.MainView = Backbone.View.extend({
     this.$form             = this.$('#search_movie');
     this.$nameInput        = this.$form.children('#movie_name_input');
     this.$yearInput        = this.$form.children('#movie_year_input');
-    this.$loadingIndicator = this.$('#loading');
   },
 
   searchMovie: function(event) {
@@ -157,19 +169,15 @@ AnyGood.MainView = Backbone.View.extend({
     });
   },
 
-  getAndDisplayMovie: function(name, year, $spinner) {
-    $spinner.removeClass('hidden');
-
+  getAndDisplayMovie: function(name, year) {
+    this.renderLoadingMovieView();
     var movie = new AnyGood.Movie({name: name, year: year});
-
     movie.fetch({
       success: function(movie) {
         AnyGood.mainView.renderMovie(movie);
-        $spinner.addClass('hidden');
       },
       error: function() {
         AnyGood.mainView.renderError();
-        $spinner.addClass('hidden');
       }
     });
   },
@@ -181,6 +189,11 @@ AnyGood.MainView = Backbone.View.extend({
 
   renderError: function() {
     var template = _.template($('#500-template').html());
+    this.$("#result").html(template());
+  },
+
+  renderLoadingMovieView: function() {
+    var template = _.template($('#loading-template').html());
     this.$("#result").html(template());
   }
 });
