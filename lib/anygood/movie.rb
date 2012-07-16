@@ -11,7 +11,7 @@ module AnyGood
     def combined_rating
       scores = @ratings.map {|rating| rating[:score]}.compact
       scores.select! {|score| score > 0 }
-      scores.inject(:+) / scores.length
+      scores.length > 0 ? scores.inject(:+) / scores.length : 0
     end
 
     def as_json(options={})

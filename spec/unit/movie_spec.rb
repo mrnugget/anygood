@@ -45,6 +45,17 @@ describe AnyGood::Movie do
       inception.combined_rating.should == 8.95
     end
 
+    it 'returns 0 when all ratings have errors' do
+      ratings = [
+        {name: 'IMDB', error: 'Could not be loaded'},
+        {name: 'Rotten Tomatoes', error: 'Could not be loaded'}
+      ]
+
+      inception = AnyGood::Movie.new(ratings: ratings)
+
+      inception.combined_rating.should == 0
+    end
+
     it 'ignores ratings that are nil' do
       ratings = [
         {name: 'IMDB', score: nil},
