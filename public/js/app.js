@@ -24,7 +24,7 @@ AnyGood.Movie = Backbone.Model.extend({
     name: '',
     year: 0,
     info: '',
-    ratings: {},
+    ratings: [],
     combined_rating: 0
   },
   url: function () {
@@ -34,9 +34,9 @@ AnyGood.Movie = Backbone.Model.extend({
     var scoresToCalculate = [];
     var ratings           = this.get('ratings');
 
-    for (var ratingSite in ratings) {
-      if (ratings[ratingSite].ignored === false || ratings[ratingSite].ignored === undefined) {
-        scoresToCalculate.push(ratings[ratingSite].score);
+    for (var i = 0; i < ratings.length; i++) {
+      if (ratings[i].ignored === false || ratings[i].ignored === undefined) {
+        scoresToCalculate.push(ratings[i].score);
       }
     }
     return scoresToCalculate;
@@ -56,13 +56,13 @@ AnyGood.Movie = Backbone.Model.extend({
     this.set('combined_rating', combinedRating);
   },
 
-  toggleRatingIgnoreStatus: function(ratingSite) {
+  toggleRatingIgnoreStatus: function(ratingIndex) {
     var ratings = this.get('ratings');
 
-    if (ratings[ratingSite] && ratings[ratingSite].ignored === true) {
-      ratings[ratingSite].ignored = false;
+    if (ratings[ratingIndex] && ratings[ratingIndex].ignored === true) {
+      ratings[ratingIndex].ignored = false;
     } else {
-      ratings[ratingSite].ignored = true;
+      ratings[ratingIndex].ignored = true;
     }
     this.set('ratings', ratings);
     this.calculateCombinedRating();
@@ -109,11 +109,11 @@ AnyGood.MovieView = Backbone.View.extend({
   toggleRatingIgnore: function(event) {
     event.preventDefault();
 
-    var $button    = $(event.target);
-    var $rating    = $button.parents('.rating');
-    var ratingSite = $rating.attr('data-rating-site');
+    var $button     = $(event.target);
+    var $rating     = $button.parents('.rating');
+    var ratingIndex = $rating.attr('data-rating-index');
 
-    this.model.toggleRatingIgnoreStatus(ratingSite);
+    this.model.toggleRatingIgnoreStatus(ratingIndex);
   }
 });
 

@@ -8,7 +8,7 @@ module AnyGood
       end
 
       def rating
-        found? ? {score: score, url: url} : @data
+        found? ? {name: self.class.name, score: score, url: url} : @data
       end
 
       def initialize(movie_name, year)
@@ -22,9 +22,9 @@ module AnyGood
         def fetch_data
           begin
             response = JSON.parse(query_api)
-            matching_movie(response) || {error: 'Could not be found'}
+            matching_movie(response) || {name: self.class.name, error: 'Could not be found'}
           rescue JSON::ParserError
-            {error: 'Could not be parsed'}
+            {name: self.class.name, error: 'Could not be parsed'}
           end
         end
 

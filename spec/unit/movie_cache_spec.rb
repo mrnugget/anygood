@@ -10,7 +10,7 @@ describe AnyGood::MovieCache do
       encoded_client_name = URI.encode('client_name')
 
       key     = "movierating:#{encoded_movie_name}:#{encoded_client_name}"
-      payload = {score: 5}
+      payload = {name: 'client_name', score: 5}
 
       AnyGood::REDIS.should_receive(:setex).with(key, 14400, payload.to_json)
 
@@ -35,7 +35,7 @@ describe AnyGood::MovieCache do
     it 'allows to get movie ratings from the cache' do
       encoded_client_name = URI.encode('client_name')
 
-      key     = "movierating:#{encoded_movie_name}:#{encoded_client_name}"
+      key = "movierating:#{encoded_movie_name}:#{encoded_client_name}"
 
       AnyGood::REDIS.should_receive(:get).with(key)
 
@@ -46,7 +46,7 @@ describe AnyGood::MovieCache do
     it 'allows to get movie information from the cache' do
       encoded_client_name = URI.encode('info_client')
 
-      key     = "movieinfo:#{encoded_movie_name}:#{encoded_client_name}"
+      key = "movieinfo:#{encoded_movie_name}:#{encoded_client_name}"
 
       AnyGood::REDIS.should_receive(:get).with(key)
 

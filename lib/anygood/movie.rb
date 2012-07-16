@@ -9,7 +9,7 @@ module AnyGood
     end
 
     def combined_rating
-      scores = @ratings.map {|key, value| value[:score]}.compact
+      scores = @ratings.map {|rating| rating[:score]}.compact
       scores.select! {|score| score > 0 }
       scores.inject(:+) / scores.length
     end

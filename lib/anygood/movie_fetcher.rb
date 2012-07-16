@@ -35,8 +35,8 @@ module AnyGood
       end
 
       def ratings_for(movie_name, year)
-        self.rating_clients.inject({}) do |ratings, client|
-          ratings[client.name] = fetch_from_cache_or_client(:rating, movie_name, year, client)
+        self.rating_clients.inject([]) do |ratings, client|
+          ratings << fetch_from_cache_or_client(:rating, movie_name, year, client)
           ratings
         end
       end

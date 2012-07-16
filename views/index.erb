@@ -75,16 +75,16 @@
         <div class="combined-rating">
           Combined Rating: {{= combined_rating}}/10
         </div>
-        {{ $.each(ratings, function(rating_site, rating) { }}
+        {{ $.each(ratings, function(index, rating) { }}
           {{ if (rating.error) { }}
             <div class="rating-error">
-              <h4>{{= rating_site}}</h4>
+              <h4>{{= rating.name}}</h4>
               {{= rating.error }}
             </div>
           {{ } else { }}
-            <div class="rating {{= rating.ignored === true ? 'ignored' : '' }}" data-rating-site="{{= rating_site}}">
+            <div class="rating {{= rating.ignored === true ? 'ignored' : '' }}" data-rating-index="{{= index}}">
               <h4>
-                <a href="{{= rating.url}}">{{= rating_site}}</a>
+                <a href="{{= rating.url}}">{{= rating.name}}</a>
                 <a href="#" class="ignore-button">Click to exclude/include this rating</a>
               </h4>
               Rating: {{= rating.score }}/10

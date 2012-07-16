@@ -43,6 +43,7 @@ describe AnyGood::Clients::IMDB do
     it 'represents the rating of the specified movie' do
       imdb_client = AnyGood::Clients::IMDB.fetch('Inception', 2010)
 
+      imdb_client.rating[:name].should == 'IMDB'
       imdb_client.rating[:score].should == 8.8
       imdb_client.rating[:url].should == 'http://www.imdb.com/title/tt1375666'
     end

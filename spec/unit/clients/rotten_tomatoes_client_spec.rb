@@ -52,6 +52,7 @@ describe AnyGood::Clients::RottenTomatoes do
     it 'represents the rating of the specified movie' do
       rt_client = AnyGood::Clients::RottenTomatoes.fetch('Inception', 2010)
 
+      rt_client.rating[:name].should == 'Rotten Tomatoes'
       rt_client.rating[:score].should == 8.95
       rt_client.rating[:url].should == 'http://www.rottentomatoes.com/m/inception/'
     end

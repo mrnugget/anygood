@@ -3,10 +3,10 @@ require 'spec_helper'
 describe AnyGood::Movie do
   describe 'initialize' do
     it 'sets the right attributes' do
-      ratings = {
-        'IMDB' => {score: 8.8, url: 'http://www.imdb.com/title/tt1375666/'},
-        'Rotten Tomatoes' => {score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
-      }
+      ratings = [
+        {name: 'IMDB', score: 8.8, url: 'http://www.imdb.com/title/tt1375666/'},
+        {name: 'Rotten Tomatoes', score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
+      ]
 
       movie = AnyGood::Movie.new(
         name: 'Inception',
@@ -24,10 +24,10 @@ describe AnyGood::Movie do
 
   describe '#combined_rating' do
     it 'returns the calculated combined rating' do
-      ratings = {
-        'IMDB' => {score: 8.8, url: 'http://www.imdb.com/title/tt1375666/'},
-        'Rotten Tomatoes' => {score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
-      }
+      ratings = [
+        {name: 'IMDB', score: 8.8, url: 'http://www.imdb.com/title/tt1375666/'},
+        {name: 'Rotten Tomatoes', score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
+      ]
 
       inception = AnyGood::Movie.new(ratings: ratings)
 
@@ -35,10 +35,10 @@ describe AnyGood::Movie do
     end
 
     it 'ignores ratings with errors' do
-      ratings = {
-        'IMDB' => {error: 'Could not be loaded'},
-        'Rotten Tomatoes' => {score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
-      }
+      ratings = [
+        {name: 'IMDB', error: 'Could not be loaded'},
+        {name: 'Rotten Tomatoes', score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
+      ]
 
       inception = AnyGood::Movie.new(ratings: ratings)
 
@@ -46,10 +46,10 @@ describe AnyGood::Movie do
     end
 
     it 'ignores ratings that are nil' do
-      ratings = {
-        'IMDB' => {score: nil},
-        'Rotten Tomatoes' => {score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
-      }
+      ratings = [
+        {name: 'IMDB', score: nil},
+        {name: 'Rotten Tomatoes', score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
+      ]
 
       inception = AnyGood::Movie.new(ratings: ratings)
 
@@ -57,21 +57,21 @@ describe AnyGood::Movie do
     end
 
     it 'ignores ratings that are zero' do
-      ratings = {
-        'IMDB' => {score: 0},
-        'Rotten Tomatoes' => {score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
-      }
+      ratings = [
+        {name: 'IMDB', score: 0},
+        {name: 'Rotten Tomatoes', score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
+      ]
 
       inception = AnyGood::Movie.new(ratings: ratings)
 
       inception.combined_rating.should == 8.95
     end
 
-    it 'handles empty rating hashes' do
-      ratings = {
-        'IMDB' => {},
-        'Rotten Tomatoes' => {score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
-      }
+    it 'handles ratings without score' do
+      ratings = [
+        {name: 'IMDB'},
+        {name: 'Rotten Tomatoes', score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
+      ]
 
       inception = AnyGood::Movie.new(ratings: ratings)
 
@@ -84,10 +84,10 @@ describe AnyGood::Movie do
       movie = AnyGood::Movie.new(
         name: 'Inception',
         year: 2010,
-        ratings: {
-          'IMDB' => {score: 8.8, url: 'http://www.imdb.com/title/tt1375666/'},
-          'Rotten Tomatoes' => {score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
-        },
+        ratings: [
+          {name: 'IMDB', score: 8.8, url: 'http://www.imdb.com/title/tt1375666/'},
+          {name: 'Rotten Tomatoes', score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}
+        ],
         info: {
           poster: 'http://content8.flixster.com/movie/10/93/37/10933762_det.jpg'
         }
@@ -97,8 +97,8 @@ describe AnyGood::Movie do
 
       parsed_json_movie['name'].should == 'Inception'
       parsed_json_movie['year'].should == 2010
-      parsed_json_movie['ratings']['IMDB']['score'].should == 8.8
-      parsed_json_movie['ratings']['Rotten Tomatoes']['score'].should == 8.95
+      parsed_json_movie['ratings'].first['score'].should == 8.8
+      parsed_json_movie['ratings'].last['score'].should == 8.95
       parsed_json_movie['info']['poster'].should ==  'http://content8.flixster.com/movie/10/93/37/10933762_det.jpg'
     end
   end
