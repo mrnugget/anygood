@@ -3,9 +3,9 @@ require 'spec_helper'
 describe AnyGood::MovieFetcher do
   describe '.fetch_by_name_and_year' do
     before(:each) do
-      @rating = {name: 'rating_client', score: 8.0, url: 'www.one.com'}
-      rating_client_result  = stub(:rating_client_result, rating: @rating)
-      @rating_client        = stub(:rating_client, name: 'rating_client', fetch: rating_client_result)
+      @rating              = {name: 'rating_client', score: 8.0, url: 'www.one.com'}
+      rating_client_result = stub(:rating_client_result, rating: @rating)
+      @rating_client       = stub(:rating_client, name: 'rating_client', fetch: rating_client_result)
 
       @movie_info        = {poster: 'www.posterurl.com/pic.jpg'}
       info_client_result = stub(:info_client_result, info: @movie_info)
@@ -46,7 +46,7 @@ describe AnyGood::MovieFetcher do
 
       it 'fetches ratings from all rating clients' do
         second_rating_client_rating = {name: 'second_rating_client', score: 4.0, url: 'www.two.com'}
-        second_rating_client_result  = stub(:second_rating_client_result, rating: second_rating_client_rating)
+        second_rating_client_result = stub(:second_rating_client_result, rating: second_rating_client_rating)
         second_rating_client        = stub(:second_rating_client, name: 'second_rating_client', fetch: second_rating_client_result)
 
         @movie_fetcher.rating_clients = [@rating_client, second_rating_client]
@@ -58,8 +58,8 @@ describe AnyGood::MovieFetcher do
       end
 
       it 'writes the fetched client results into the cache' do
-        @cache.should_receive(:write).with(:rating, 'Inception', 'rating_client', @rating)
-        @cache.should_receive(:write).with(:info, 'Inception', 'info_client', @movie_info)
+        @cache.should_receive(:write).with(:rating, 'Inception', 2010, 'rating_client', @rating)
+        @cache.should_receive(:write).with(:info, 'Inception', 2010, 'info_client', @movie_info)
 
         @movie_fetcher.fetch_by_name_and_year('Inception', 2010)
       end
@@ -80,8 +80,8 @@ describe AnyGood::MovieFetcher do
 
     context 'only the movieinfo is written to the cache' do
       it 'still fetches the ratings via the rating clients' do
-        @cache.should_receive(:get).with(:info, 'Inception', 'info_client').and_return(:cached_info)
-        @cache.should_receive(:get).with(:rating, 'Inception', 'rating_client').and_return(nil)
+        @cache.should_receive(:get).with(:info, 'Inception', 2010, 'info_client').and_return(:cached_info)
+        @cache.should_receive(:get).with(:rating, 'Inception', 2010, 'rating_client').and_return(nil)
 
         @rating_client.should_receive(:fetch)
         @info_client.should_not_receive(:fetch)
@@ -92,8 +92,8 @@ describe AnyGood::MovieFetcher do
 
     context 'only the ratings are written to the cache' do
       it 'still fetches the movie info via the info client' do
-        @cache.should_receive(:get).with(:rating, 'Inception', 'rating_client').and_return(:cached_result)
-        @cache.should_receive(:get).with(:info, 'Inception', 'info_client').and_return(nil)
+        @cache.should_receive(:get).with(:rating, 'Inception', 2010, 'rating_client').and_return(:cached_result)
+        @cache.should_receive(:get).with(:info, 'Inception', 2010, 'info_client').and_return(nil)
 
         @info_client.should_receive(:fetch)
         @rating_client.should_not_receive(:fetch)

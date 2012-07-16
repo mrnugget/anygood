@@ -20,39 +20,39 @@ module AnyGood
       @info_client ||= Clients::RottenTomatoes
     end
 
-    def fetch_by_name_and_year(movie_name, year)
-      ratings = ratings_for(movie_name, year)
-      info    = info_for(movie_name, year)
+    def fetch_by_name_and_year(movie_name, movie_year)
+      ratings = ratings_for(movie_name, movie_year)
+      info    = info_for(movie_name, movie_year)
 
-      MovieMatcher.new.incr_score_for(name: movie_name, year: year)
-      Movie.new(name: movie_name, year: year, ratings: ratings, info: info)
+      MovieMatcher.new.incr_score_for(name: movie_name, year: movie_year)
+      Movie.new(name: movie_name, year: movie_year, ratings: ratings, info: info)
     end
 
     private
 
-      def info_for(movie_name, year)
-        fetch_from_cache_or_client(:info, movie_name, year, self.info_client)
+      def info_for(movie_name, movie_year)
+        fetch_from_cache_or_client(:info, movie_name, movie_year, self.info_client)
       end
 
-      def ratings_for(movie_name, year)
+      def ratings_for(movie_name, movie_year)
         self.rating_clients.inject([]) do |ratings, client|
-          ratings << fetch_from_cache_or_client(:rating, movie_name, year, client)
+          ratings << fetch_from_cache_or_client(:rating, movie_name, movie_year, client)
           ratings
         end
       end
 
-      def fetch_from_cache_or_client(type, movie_name, year, client)
-        get_or_cache(type, movie_name, client.name) do
-          client.fetch(movie_name, year).send(type)
+      def fetch_from_cache_or_client(type, movie_name, movie_year, client)
+        get_or_cache(type, movie_name, movie_year, client.name) do
+          client.fetch(movie_name, movie_year).send(type)
         end
       end
 
-      def get_or_cache(type, movie_name, client_name)
-        if cached = self.cache.get(type, movie_name, client_name)
+      def get_or_cache(*args)
+        if cached = self.cache.get(*args)
           cached
         else
           payload = yield
-          self.cache.write(type, movie_name, client_name, payload)
+          self.cache.write(*args, payload)
           payload
         end
       end

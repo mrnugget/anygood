@@ -60,15 +60,15 @@ describe '/api/movies' do
 
   it 'reconstructs the movie ratings and info from the cache without hitting the network' do
     AnyGood::REDIS.set(
-      "movierating:#{URI.encode('Inception')}:#{URI.encode('IMDB')}",
+      "movierating:#{URI.encode('Inception')}:2010:#{URI.encode('IMDB')}",
       {name: 'IMDB', score: 9.0, url: 'example.org'}.to_json
     )
     AnyGood::REDIS.set(
-      "movierating:#{URI.encode('Inception')}:#{URI.encode('Rotten Tomatoes')}",
+      "movierating:#{URI.encode('Inception')}:2010:2010:#{URI.encode('Rotten Tomatoes')}",
       {name: 'Rotten Tomatoes', score: 8.95, url: 'http://www.rottentomatoes.com/m/inception/'}.to_json
     )
     AnyGood::REDIS.set(
-      "movieinfo:#{URI.encode('Inception')}:#{URI.encode('Rotten Tomatoes')}",
+      "movieinfo:#{URI.encode('Inception')}:2010:#{URI.encode('Rotten Tomatoes')}",
       {
         poster: 'http://content8.flixster.com/movie/10/93/37/10933762_det.jpg',
         year: 2010
