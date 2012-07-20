@@ -142,8 +142,8 @@ AnyGood.MainView = Backbone.View.extend({
 
   initialize: function() {
     this.$form             = this.$('#search_movie');
-    this.$nameInput        = this.$form.children('#movie_name_input');
-    this.$yearInput        = this.$form.children('#movie_year_input');
+    this.$nameInput        = this.$form.children('#movie-name-input');
+    this.$yearInput        = this.$form.children('#movie-year-input');
   },
 
   searchMovie: function(event) {
@@ -226,8 +226,8 @@ $(function(AnyGood) {
       });
     },
     select: function(event,ui) {
-      $('#movie_year_input').val(ui.item.year);
-      $('#movie_name_input').val(ui.item.value);
+      $('#movie-year-input').val(ui.item.year);
+      $('#movie-name-input').val(ui.item.value);
       $(this).parents('form').submit();
       $(this).blur();
     },
