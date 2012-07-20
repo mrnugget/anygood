@@ -36,7 +36,9 @@ AnyGood.Movie = Backbone.Model.extend({
 
     for (var i = 0; i < ratings.length; i++) {
       if (ratings[i].ignored === false || ratings[i].ignored === undefined) {
-        scoresToCalculate.push(ratings[i].score);
+        if (ratings[i].score !== 0.0) {
+          scoresToCalculate.push(ratings[i].score);
+        }
       }
     }
     return scoresToCalculate;
@@ -54,6 +56,7 @@ AnyGood.Movie = Backbone.Model.extend({
       combinedRating = scoresSum / scores.length;
     }
     this.set('combined_rating', combinedRating);
+    this.trigger('change');
   },
 
   toggleRatingIgnoreStatus: function(ratingIndex) {
