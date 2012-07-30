@@ -28,6 +28,22 @@ module AnyGood
       end
     end
 
+    post '/api/search' do
+      unless params['movie'] && params['movie']['name'] && params['movie']['year']
+        content_type :json
+        status 422
+        {error: 'You have to provide a name and a year for the movie'}.to_json
+      else
+        movie_hash = {
+          name: params['movie']['name'],
+          year: params['movie']['year'].to_i
+        }
+        movie_matcher = MovieMatcher.new
+        movie_matcher.add_movie(movie_hash)
+        status 200
+      end
+    end
+
     get '/api/movies/:year/:name' do
       content_type :json
 
