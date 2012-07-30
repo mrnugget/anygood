@@ -15,7 +15,7 @@ AnyGood.Router = Backbone.Router.extend({
     AnyGood.mainView.getAndDisplayMovie(movieName, year, AnyGood.mainView.$loadingIndicator);
   },
   searchMovie: function(term) {
-    AnyGood.mainView.getAndDisplaySearchResults(term);
+    AnyGood.mainView.getAndDisplaySearchResult(term);
   }
 });
 
@@ -78,6 +78,75 @@ AnyGood.SearchResult = Backbone.Model.extend({
   }
 });
 
+AnyGood.AddMovieView = Backbone.View.extend({
+  template: _.template($('#add-movie-template').html()),
+
+  events: {
+    'submit #add-movie': 'addMovie',
+  },
+
+  initialize: function() {
+    _.bindAll(this, 'render');
+  },
+
+  render: function() {
+    this.$el.html(this.template());
+    return this;
+  },
+
+  addMovie: function(event) {
+    event.preventDefault();
+    var movieName = $('#add-movie').children('#new-movie-name').val();
+    var movieYear = $('#add-movie').children('#new-movie-year').val();
+    if (movieName === '' || movieYear === '') {
+      this.$('.not-valid').show();
+    } else {
+      this.makeRequest(movieName, movieYear);
+    }
+  },
+
+  makeRequest: function(movieName, movieYear) {
+    $.ajax({
+      url: '/api/search',
+      type: 'POST',
+      data: {
+        movie: {name: movieName, year: movieYear}
+      },
+      success: function(data) {
+        AnyGood.mainView.renderAddMovieSuccessView(movieName, movieYear);
+      },
+    });
+  }
+});
+
+AnyGood.AddMovieSuccessView = Backbone.View.extend({
+  template: _.template($('#add-movie-success-template').html()),
+
+  initialize: function() {
+    _.bindAll(this, 'render');
+  },
+
+  render: function() {
+    this.$el.html(this.template(this.model));
+    return this;
+  }
+});
+
+AnyGood.NoSearchResultView = Backbone.View.extend({
+  template: _.template($('#no-search-result-template').html()),
+
+  initialize: function() {
+    _.bindAll(this, 'render');
+  },
+
+  render: function() {
+    this.$el.html(this.template());
+    this.addMovieView = new AnyGood.AddMovieView({ el: this.$('.add-to-index-form') });
+    this.addMovieView.render();
+    return this;
+  },
+});
+
 AnyGood.SearchResultView = Backbone.View.extend({
   template: _.template($('#search-result-template').html()),
 
@@ -88,6 +157,8 @@ AnyGood.SearchResultView = Backbone.View.extend({
 
   render: function() {
     this.$el.html(this.template(this.model.toJSON()));
+    this.addMovieView = new AnyGood.AddMovieView({ el: this.$('.add-to-index-form') });
+    this.addMovieView.render();
     return this;
   },
 });
@@ -158,16 +229,21 @@ AnyGood.MainView = Backbone.View.extend({
     AnyGood.router.navigate(url, {trigger: true});
   },
 
-  getAndDisplaySearchResults: function(term) {
+  getAndDisplaySearchResult: function(term) {
     $.ajax({
       url: '/api/search',
       data: {
         term: term
       },
       success: function(data) {
-        var searchResult     = new AnyGood.SearchResult({movies: data.movies});
-        var searchResultView = new AnyGood.SearchResultView({model: searchResult});
-        $("#result").html(searchResultView.render().el);
+        if (data.movies.length > 0) {
+          var searchResult     = new AnyGood.SearchResult({movies: data.movies});
+          var searchResultView = new AnyGood.SearchResultView({model: searchResult});
+          $("#content").html(searchResultView.render().el);
+        } else {
+          var noSearchResultView = new AnyGood.NoSearchResultView({});
+          $("#content").html(noSearchResultView.render().el);
+        }
       },
     });
   },
@@ -187,21 +263,24 @@ AnyGood.MainView = Backbone.View.extend({
 
   renderMovie: function(movie) {
     var view = new AnyGood.MovieView({model: movie});
-    this.$("#result").html(view.render().el);
+    this.$("#content").html(view.render().el);
   },
 
   renderError: function() {
     var template = _.template($('#500-template').html());
-    this.$("#result").html(template());
+    this.$("#content").html(template());
   },
 
   renderLoadingMovieView: function() {
     var template = _.template($('#loading-template').html());
-    this.$("#result").html(template());
+    this.$("#content").html(template());
+  },
+
+  renderAddMovieSuccessView: function(movieName, movieYear) {
+    var view = new AnyGood.AddMovieSuccessView({model: { name: movieName, year: movieYear}});
+    this.$("#content").html(view.render().el);
   }
 });
-
-
 
 $(function(AnyGood) {
   AnyGood.router   = new AnyGood.Router();

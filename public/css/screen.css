@@ -45,9 +45,31 @@ a:hover {
 #search_movie input[type=submit] {
   font-size: 1.5em;
 }
-/* Result Div */
 
-#result {
+/* Add Movie Form */
+#add-movie {
+  text-align: center;
+}
+#add-movie input {
+  font-size: 1em;
+  border: none;
+  padding: 0.5em;
+  -webkit-appearance: none;
+}
+#new-movie-name {
+  width: 20em;
+}
+#new-movie-year {
+  width: 10em;
+}
+div.not-valid {
+  color: hsl(0, 40%, 40%);
+  text-align: center;
+  padding: 0.5em;
+}
+/* Content Div */
+
+#content {
   padding: 1em;
 }
 

@@ -20,7 +20,7 @@
         <input type="submit" value="Search" class="button">
       </form>
 
-      <div id="result">
+      <div id="content">
 
       </div>
     </div>
@@ -66,18 +66,53 @@
     </div>
   </script>
 
+  <script type="text/template" id="add-movie-template">
+    <div class="not-valid" style="display: none;">
+      You have to specify the name and the year of the movie.
+    </div>
+    <form action="/api/search" id="add-movie" method="post">
+      <input id="new-movie-name" type="text" name="name" placeholder="Enter the name of a movie here...">
+      <input id="new-movie-year" type="text" name="year" placeholder="and the year.">
+      <input type="submit" value="Add this movie">
+    </form>
+  </script>
+
+  <script type="text/template" id="add-movie-success-template">
+    <div id="add-movie-success">
+      <h3>Thanks!</h3>
+      <p>Thanks for making this page better! The following movie has been added to the index:</p>
+      <p class="just-added"><a href="#movies/{{= year }}/{{= name.split(' ').join('_') }}">{{= name}} ({{=year}})</a></p>
+    </div>
+  </script>
+
+  <script type="text/template" id="no-search-result-template">
+    <div id="no-search-result">
+      <h3>No Search Results</h3>
+      <p>The movie you are looking for could not be found in the movie index.</p>
+
+      <div class="add-to-index">
+        <h3>Add a movie to the index!</h3>
+        <p>You can help! If you specify the exact name and the release year of the movie, it will get added to the index!</p>
+        <div class="add-to-index-form">
+        </div>
+      </div>
+    </div>
+  </script>
+
   <script type="text/template" id="search-result-template">
     <div class="search-result">
       <h3>Search Results:</h3>
-      {{ if (movies.length > 0) { }}
-        <ul>
-        {{ $.each(movies, function(index, movie) { }}
-          <li><a href="#movies/{{= movie.year }}/{{= movie.name.split(' ').join('_') }}" class="search-result">{{= movie.name}} ({{=movie.year}})</a></li>
-        {{ }); }}
-        </ul>
-      {{ } else { }}
-        <p>Sorry! Couldn't find any matching movies, mate :(</p>
-      {{ } }}
+      <ul>
+      {{ $.each(movies, function(index, movie) { }}
+        <li><a href="#movies/{{= movie.year }}/{{= movie.name.split(' ').join('_') }}" class="search-result">{{= movie.name}} ({{=movie.year}})</a></li>
+      {{ }); }}
+      </ul>
+      <div class="add-to-index">
+        <h3>Not what you're looking for?</h3>
+        <p>You can help! If you specify the exact name and the release year of the movie, it will get added to the index!</p>
+        <div class="add-to-index-form">
+        </div>
+      </div>
     </div>
   </script>
 
@@ -129,7 +164,6 @@
       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
     })();
-
   </script>
 </body>
 </html>
