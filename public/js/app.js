@@ -232,6 +232,8 @@ AnyGood.MainView = Backbone.View.extend({
       var url = "search/" + this.$nameInput.val();
     }
     AnyGood.router.navigate(url, {trigger: true});
+    AnyGood.mainView.$nameInput.autocomplete('close');
+    AnyGood.mainView.$nameInput.blur();
   },
 
   getAndDisplaySearchResult: function(term) {
