@@ -11,8 +11,7 @@ AnyGood.Router = Backbone.Router.extend({
     "search/:term" : "searchMovie"
   },
   showMovie: function(year, name) {
-    var movieName = name.split('_').join(' ');
-    AnyGood.mainView.getAndDisplayMovie(movieName, year, AnyGood.mainView.$loadingIndicator);
+    AnyGood.mainView.getAndDisplayMovie(name.split('_').join(' '), year);
   },
   searchMovie: function(term) {
     AnyGood.mainView.getAndDisplaySearchResult(term);
@@ -86,7 +85,7 @@ AnyGood.AddMovieView = Backbone.View.extend({
   },
 
   initialize: function() {
-    _.bindAll(this, 'render');
+    _.bindAll(this, 'render', 'addMovie');
   },
 
   render: function() {
@@ -96,13 +95,23 @@ AnyGood.AddMovieView = Backbone.View.extend({
 
   addMovie: function(event) {
     event.preventDefault();
-    var movieName = $('#add-movie').children('#new-movie-name').val();
-    var movieYear = $('#add-movie').children('#new-movie-year').val();
+    var movieName = this.$('#new-movie-name').val();
+    var movieYear = this.$('#new-movie-year').val();
+
     if (movieName === '' || movieYear === '') {
       this.$('.not-valid').show();
     } else {
-      this.makeRequest(movieName, movieYear);
+      this.makeRequest(this.capitalizeFirstLetters(movieName), movieYear);
     }
+  },
+
+  capitalizeFirstLetters: function(movieName) {
+    var _words            = movieName.split(' ');
+    var _transformedWords = [];
+    for (var i = 0; i < _words.length; i++) {
+      _transformedWords.push(_words[i].charAt(0).toUpperCase() + _words[i].slice(1));
+    }
+    return _transformedWords.join(' ');
   },
 
   makeRequest: function(movieName, movieYear) {
@@ -165,10 +174,6 @@ AnyGood.SearchResultView = Backbone.View.extend({
 
 AnyGood.LoadingMovieView = Backbone.View.extend({
   template: _.template($('#loading-template').html()),
-
-  initialize: function() {
-    _.bindAll(this, 'render');
-  },
 
   render: function() {
     this.$el.html(this.template(this.model.toJSON()));
@@ -237,13 +242,12 @@ AnyGood.MainView = Backbone.View.extend({
       },
       success: function(data) {
         if (data.movies.length > 0) {
-          var searchResult     = new AnyGood.SearchResult({movies: data.movies});
-          var searchResultView = new AnyGood.SearchResultView({model: searchResult});
-          $("#content").html(searchResultView.render().el);
+          var searchResult = new AnyGood.SearchResult({movies: data.movies});
+          var view         = new AnyGood.SearchResultView({model: searchResult});
         } else {
-          var noSearchResultView = new AnyGood.NoSearchResultView({});
-          $("#content").html(noSearchResultView.render().el);
+          var view = new AnyGood.NoSearchResultView({});
         }
+        $("#content").html(view.render().el);
       },
     });
   },
