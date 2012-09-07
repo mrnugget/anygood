@@ -1,5 +1,8 @@
 # Any good?
 
+[![Build Status](https://secure.travis-ci.org/mrnugget/anygood.png)](http://travis-ci.org/mrnugget/anygood)
+
+
 So! You quickly want to see if a movie was any good, without sifting through
 reviews and comparing different ratings on different websites? Great, AnyGood is
 here to help.
