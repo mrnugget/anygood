@@ -1,6 +1,8 @@
 language: ruby
 rvm:
   - 1.9.3
+  - rbx-19mode
+  - jruby-19mode
 services: 
   - redis
 script: bundle exec rspec spec
