@@ -15,8 +15,8 @@ describe '/api/movies' do
 
     rt_rating = rating_with_name('Rotten Tomatoes', parsed_body['ratings'])
     rt_rating['score'].should == 8.95
-    imdb_rating = rating_with_name('IMDB', parsed_body['ratings'])
-    imdb_rating['score'].should == 8.8
+    # imdb_rating = rating_with_name('IMDB', parsed_body['ratings'])
+    # imdb_rating['score'].should == 8.8
   end
 
   it 'does not fail if one clients has a parse error' do
@@ -26,8 +26,8 @@ describe '/api/movies' do
 
     parsed_body = JSON.parse(last_response.body)
 
-    imdb_rating = rating_with_name('IMDB', parsed_body['ratings'])
-    imdb_rating['error'].should == 'Could not be parsed'
+    # imdb_rating = rating_with_name('IMDB', parsed_body['ratings'])
+    # imdb_rating['error'].should == 'Could not be parsed'
 
     parsed_body['combined_rating'].should == 8.95
   end
@@ -42,10 +42,10 @@ describe '/api/movies' do
     rt_rating = rating_with_name('Rotten Tomatoes', parsed_body['ratings'])
     rt_rating['error'].should == 'Could not be found'
 
-    imdb_rating = rating_with_name('IMDB', parsed_body['ratings'])
-    imdb_rating['score'].should == 8.8
+    # imdb_rating = rating_with_name('IMDB', parsed_body['ratings'])
+    # imdb_rating['score'].should == 8.8
 
-    parsed_body['combined_rating'].should == 8.8
+    parsed_body['combined_rating'].should == 0
   end
 
   it 'works with escaped movie names in the url and returns the right moviename' do
@@ -78,10 +78,10 @@ describe '/api/movies' do
     get '/api/movies/2010/Inception'
 
     parsed_body = JSON.parse(last_response.body)
-    imdb_rating = rating_with_name('IMDB', parsed_body['ratings'])
-    imdb_rating['score'].should == 9.0
-    imdb_rating['url'].should == 'example.org'
-    parsed_body['combined_rating'].should == 8.975
+    # imdb_rating = rating_with_name('IMDB', parsed_body['ratings'])
+    # imdb_rating['score'].should == 9.0
+    # imdb_rating['url'].should == 'example.org'
+    parsed_body['combined_rating'].should == 8.95
 
     a_request(:get, /www/).should_not have_been_made
   end
