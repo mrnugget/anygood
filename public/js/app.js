@@ -13,9 +13,7 @@ AnyGood.Router = Backbone.Router.extend({
   showMovie: function(year, name) {
     AnyGood.mainView.getAndDisplayMovie(name.split('_').join(' '), year);
   },
-  searchMovie: function(term) {
-    AnyGood.mainView.getAndDisplaySearchResult(term);
-  }
+  searchMovie: AnyGood.mainView.getAndDisplaySearchResult
 });
 
 AnyGood.Movie = Backbone.Model.extend({
@@ -48,12 +46,13 @@ AnyGood.Movie = Backbone.Model.extend({
     var scoresSum      = 0;
     var combinedRating = 0;
 
-    for (var i = 0; i < scores.length; i++) {
-      scoresSum += scores[i];
-    }
     if (scores.length > 0) {
+      for (var i = 0; i < scores.length; i++) {
+        scoresSum += scores[i];
+      }
       combinedRating = scoresSum / scores.length;
     }
+
     this.set('combined_rating', combinedRating);
     this.trigger('change');
   },
@@ -201,9 +200,7 @@ AnyGood.MovieView = Backbone.View.extend({
   toggleRatingIgnore: function(event) {
     event.preventDefault();
 
-    var $button     = $(event.target);
-    var $rating     = $button.parents('.rating');
-    var ratingIndex = $rating.attr('data-rating-index');
+    var ratingIndex = $(event.target).parents('.rating').attr('data-rating-index');
 
     this.model.toggleRatingIgnoreStatus(ratingIndex);
   }
@@ -224,6 +221,7 @@ AnyGood.MainView = Backbone.View.extend({
 
   searchMovie: function(event) {
     event.preventDefault();
+
     if (this.$yearInput.val() != '') {
       var url = "movies/" + this.$yearInput.val() + "/" + this.$nameInput.val().split(' ').join('_');
       this.$yearInput.val('');
@@ -231,6 +229,7 @@ AnyGood.MainView = Backbone.View.extend({
     } else {
       var url = "search/" + this.$nameInput.val();
     }
+
     AnyGood.router.navigate(url, {trigger: true});
     AnyGood.mainView.$nameInput.autocomplete('close');
     AnyGood.mainView.$nameInput.blur();
@@ -256,14 +255,11 @@ AnyGood.MainView = Backbone.View.extend({
 
   getAndDisplayMovie: function(name, year) {
     this.renderLoadingMovieView();
+
     var movie = new AnyGood.Movie({name: name, year: year});
     movie.fetch({
-      success: function(movie) {
-        AnyGood.mainView.renderMovie(movie);
-      },
-      error: function() {
-        AnyGood.mainView.renderError();
-      }
+      success: AnyGood.mainView.renderMovie,
+      error: AnyGood.mainView.renderError
     });
   },
 
