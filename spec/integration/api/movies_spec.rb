@@ -87,7 +87,7 @@ describe '/api/movies' do
   end
 
   it 'increments the score of a movie after it is fetched' do
-    movie_matcher = stub(:movie_matcher)
+    movie_matcher = double(:movie_matcher)
     AnyGood::MovieMatcher.stub(new: movie_matcher)
 
     movie_matcher.should_receive(:incr_score_for).with({name: 'Inception', year: 2010})

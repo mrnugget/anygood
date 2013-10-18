@@ -4,14 +4,14 @@ describe AnyGood::MovieFetcher do
   describe '.fetch_by_name_and_year' do
     before(:each) do
       @rating              = {name: 'rating_client', score: 8.0, url: 'www.one.com'}
-      rating_client_result = stub(:rating_client_result, rating: @rating)
-      @rating_client       = stub(:rating_client, name: 'rating_client', fetch: rating_client_result)
+      rating_client_result = double(:rating_client_result, rating: @rating)
+      @rating_client       = double(:rating_client, name: 'rating_client', fetch: rating_client_result)
 
       @movie_info        = {poster: 'www.posterurl.com/pic.jpg'}
-      info_client_result = stub(:info_client_result, info: @movie_info)
-      @info_client       = stub(:info_client, name: 'info_client', fetch: info_client_result)
+      info_client_result = double(:info_client_result, info: @movie_info)
+      @info_client       = double(:info_client, name: 'info_client', fetch: info_client_result)
 
-      @cache = stub(:cache, get: nil, write: nil)
+      @cache = double(:cache, get: nil, write: nil)
 
       @movie_fetcher = AnyGood::MovieFetcher.new
       @movie_fetcher.rating_clients = [@rating_client]
@@ -46,8 +46,8 @@ describe AnyGood::MovieFetcher do
 
       it 'fetches ratings from all rating clients' do
         second_rating_client_rating = {name: 'second_rating_client', score: 4.0, url: 'www.two.com'}
-        second_rating_client_result = stub(:second_rating_client_result, rating: second_rating_client_rating)
-        second_rating_client        = stub(:second_rating_client, name: 'second_rating_client', fetch: second_rating_client_result)
+        second_rating_client_result = double(:second_rating_client_result, rating: second_rating_client_rating)
+        second_rating_client        = double(:second_rating_client, name: 'second_rating_client', fetch: second_rating_client_result)
 
         @movie_fetcher.rating_clients = [@rating_client, second_rating_client]
 
