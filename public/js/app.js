@@ -3,7 +3,10 @@ _.templateSettings = {
   evaluate: /\{\{(.+?)\}\}/g
 };
 
-var AnyGood = {};
+var AnyGood = {
+  mainView: {},
+  router: {}
+};
 
 AnyGood.Router = Backbone.Router.extend({
   routes: {
