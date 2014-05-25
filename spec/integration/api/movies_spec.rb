@@ -3,6 +3,7 @@ require 'spec_helper'
 describe '/api/movies' do
   before(:each) do
     stub_rottentomatoes_query('Inception', 'rt_inception')
+    stub_the_movie_database_query('Inception', 2010, 'tmdb_inception')
     stub_imdb_query('Inception', 2010, 'imdb_inception')
   end
 
@@ -15,19 +16,20 @@ describe '/api/movies' do
 
     rt_rating = rating_with_name('Rotten Tomatoes', parsed_body['ratings'])
     rt_rating['score'].should == 8.95
-    # imdb_rating = rating_with_name('IMDB', parsed_body['ratings'])
-    # imdb_rating['score'].should == 8.8
+
+    tmdb_rating = rating_with_name('The Movie Database', parsed_body['ratings'])
+    tmdb_rating['score'].should == 7.5
   end
 
   it 'does not fail if one clients has a parse error' do
-    stub_imdb_query('Inception', 2010, 'json_parse_error')
+    stub_the_movie_database_query('Inception', 2010, 'json_parse_error')
 
     get '/api/movies/2010/Inception'
 
     parsed_body = JSON.parse(last_response.body)
 
-    # imdb_rating = rating_with_name('IMDB', parsed_body['ratings'])
-    # imdb_rating['error'].should == 'Could not be parsed'
+    tmdb_rating = rating_with_name('The Movie Database', parsed_body['ratings'])
+    tmdb_rating['error'].should == 'Could not be parsed'
 
     parsed_body['combined_rating'].should == 8.95
   end
@@ -42,14 +44,14 @@ describe '/api/movies' do
     rt_rating = rating_with_name('Rotten Tomatoes', parsed_body['ratings'])
     rt_rating['error'].should == 'Could not be found'
 
-    # imdb_rating = rating_with_name('IMDB', parsed_body['ratings'])
-    # imdb_rating['score'].should == 8.8
+    tmdb_rating = rating_with_name('The Movie Database', parsed_body['ratings'])
+    tmdb_rating['score'].should == 7.5
 
-    parsed_body['combined_rating'].should == 0
+    parsed_body['combined_rating'].should == 7.5
   end
 
   it 'works with escaped movie names in the url and returns the right moviename' do
-    stub_imdb_query("The%20Good,%20The%20Bad%20And%20The%20Ugly", 1966, 'imdb_goodbadandugly')
+    stub_the_movie_database_query("The%20Good,%20The%20Bad%20And%20The%20Ugly", 1966, 'tmdb_goodbadandugly')
     stub_rottentomatoes_query('The%20Good,%20The%20Bad%20And%20The%20Ugly', 'rt_goodbadandugly')
 
     get '/api/movies/1966/The%20Good,%20The%20Bad%20And%20The%20Ugly'
@@ -60,8 +62,8 @@ describe '/api/movies' do
 
   it 'reconstructs the movie ratings and info from the cache without hitting the network' do
     AnyGood::REDIS.set(
-      "movierating:#{URI.encode('Inception')}:2010:#{URI.encode('IMDB')}",
-      {name: 'IMDB', score: 9.0, url: 'example.org'}.to_json
+      "movierating:#{URI.encode('Inception')}:2010:#{URI.encode('The Movie Database')}",
+      {name: 'The Movie Database', score: 7.5, url: 'example.org'}.to_json
     )
     AnyGood::REDIS.set(
       "movierating:#{URI.encode('Inception')}:2010:2010:#{URI.encode('Rotten Tomatoes')}",
@@ -78,10 +80,10 @@ describe '/api/movies' do
     get '/api/movies/2010/Inception'
 
     parsed_body = JSON.parse(last_response.body)
-    # imdb_rating = rating_with_name('IMDB', parsed_body['ratings'])
-    # imdb_rating['score'].should == 9.0
-    # imdb_rating['url'].should == 'example.org'
-    parsed_body['combined_rating'].should == 8.95
+    imdb_rating = rating_with_name('The Movie Database', parsed_body['ratings'])
+    imdb_rating['score'].should == 7.5
+    imdb_rating['url'].should == 'example.org'
+    parsed_body['combined_rating'].should == 8.225
 
     a_request(:get, /www/).should_not have_been_made
   end

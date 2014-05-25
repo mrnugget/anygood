@@ -13,7 +13,7 @@ module AnyGood
     end
 
     def rating_clients
-      @rating_clients ||= [Clients::RottenTomatoes] 
+      @rating_clients ||= [Clients::RottenTomatoes, Clients::TheMovieDatabase]
     end
 
     def info_client
