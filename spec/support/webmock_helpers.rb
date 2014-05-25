@@ -21,3 +21,13 @@ def stub_imdb_query(movie_name, year, fixture)
     body: File.read("./spec/fixtures/#{fixture}.json")
   )
 end
+
+def stub_the_movie_database_query(movie_name, year, fixture)
+  stub_http_request(
+    :get, "http://api.themoviedb.org/3/search/movie?query=#{movie_name}&year=#{year}"
+  ).with(
+    :query => {'api_key' => 'key_not_set'}
+  ).to_return(
+    body: File.read("./spec/fixtures/#{fixture}.json")
+  )
+end
