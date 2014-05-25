@@ -3,6 +3,7 @@ ruby '2.1.1'
 
 gem 'sinatra'
 gem 'sinatra-assetpack', require: 'sinatra/assetpack'
+gem 'uglifier'
 gem 'json'
 gem 'rake'
 gem 'redis'
