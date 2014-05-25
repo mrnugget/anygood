@@ -12,7 +12,7 @@ module AnyGood
       private
 
         def api_url
-          api_key = ENV.fetch('ROTTEN_TOMOATES_KEY') { 'key_not_set' }
+          api_key = ENV.fetch('ROTTEN_TOMATOES_KEY') { 'key_not_set' }
           "http://api.rottentomatoes.com/api/public/v1.0/movies.json?apikey=#{api_key}&q=#{@movie_name}"
         end
 
