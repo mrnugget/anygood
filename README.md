@@ -97,6 +97,14 @@ the following:
 With that information it's easy to use the `/api/movies` endpoint to get the
 ratings for the specified movie.
 
+## Development and Usage
+The application needs two environment variables to be set in order to work:
+
+* ROTTEN_TOMATOES_KEY
+* THE_MOVIE_DATABASE_KEY
+
+Both need to contain your key for the respective APIs.
+
 ## TODO
 
 - Error Handling:
@@ -107,7 +115,6 @@ ratings for the specified movie.
   
   There are a couple more clients I'd like to implement:
 
-  - http://www.themoviedb.org
   - http://www.moviepilot.com
 
 - Movie Info:
