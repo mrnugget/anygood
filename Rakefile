@@ -33,4 +33,18 @@ namespace :movies do
       movie_matcher.add_movie(name: movie_name, year: ENV['year'])
     end
   end
+
+  desc 'Import movie names from Wikipedia and add to Redis (from the years 2003 - today)'
+  task :import_all do
+    movie_matcher  = AnyGood::MovieMatcher.new
+
+    (2003..Time.now.year).each do |year|
+      puts "Importing movies of the year #{year}"
+      movie_importer = AnyGood::MovieImporter.new(year)
+
+      movie_importer.fetch_movies.each do |movie_name|
+        movie_matcher.add_movie(name: movie_name, year: year)
+      end
+    end
+  end
 end
