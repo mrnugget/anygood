@@ -1,5 +1,18 @@
 module AnyGood
   class App < Sinatra::Base
+    set :root, File.dirname(__FILE__)
+    register Sinatra::AssetPack
+
+    assets {
+      serve '/js',     from: 'app/js'
+      serve '/css',    from: 'app/css'
+
+      js :anygood, '/js/anygood.js', ['/js/app.js']
+      css :application, '/css/application.css', ['/css/screen.css']
+
+      # js_compression  :uglify
+      css_compression :simple
+    }
 
     configure do
       if ENV["REDISTOGO_URL"]
