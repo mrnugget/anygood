@@ -10,7 +10,7 @@ module AnyGood
       js :anygood, '/js/anygood.js', ['/js/app.js']
       css :application, '/css/application.css', ['/css/screen.css']
 
-      # js_compression  :uglify
+      js_compression  :uglify
       css_compression :simple
     }
 
