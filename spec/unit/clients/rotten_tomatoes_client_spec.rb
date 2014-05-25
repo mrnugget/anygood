@@ -18,7 +18,7 @@ describe AnyGood::Clients::RottenTomatoes do
       a_request(
         :get, 'http://api.rottentomatoes.com/api/public/v1.0/movies.json'
       ).with(
-        :query => {'apikey' => 'art7wzby22d4vmxfs9zw4qjh', 'q' => 'Inception' }
+        :query => {'apikey' => 'key_not_set', 'q' => 'Inception' }
       ).should have_been_made
     end
 
