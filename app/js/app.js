@@ -16,7 +16,9 @@ AnyGood.Router = Backbone.Router.extend({
   showMovie: function(year, name) {
     AnyGood.mainView.getAndDisplayMovie(name.split('_').join(' '), year);
   },
-  searchMovie: AnyGood.mainView.getAndDisplaySearchResult
+  searchMovie: function(term) {
+    AnyGood.mainView.getAndDisplaySearchResult(term);
+  }
 });
 
 AnyGood.Movie = Backbone.Model.extend({
