@@ -8,6 +8,7 @@ gem 'json'
 gem 'rake'
 gem 'redis'
 gem 'nokogiri'
+gem 'unicorn'
 
 group :test do
   gem 'rspec'
