@@ -74,8 +74,8 @@
       You have to specify the name and the year of the movie.
     </div>
     <form action="/api/search" id="add-movie" method="post">
-      <input id="new-movie-name" type="text" name="name" placeholder="Enter the name of a movie here...">
-      <input id="new-movie-year" type="text" name="year" placeholder="and the year.">
+      <input id="new-movie-name" type="text" name="name" value={{= term }}>
+      <input id="new-movie-year" type="text" name="year" placeholder="Year of release">
       <input type="submit" value="Add this movie">
     </form>
   </script>

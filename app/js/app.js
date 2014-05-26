@@ -88,12 +88,13 @@ AnyGood.AddMovieView = Backbone.View.extend({
     'submit #add-movie': 'addMovie',
   },
 
-  initialize: function() {
+  initialize: function(options) {
     _.bindAll(this, 'render', 'addMovie');
+    this.term = options.term;
   },
 
   render: function() {
-    this.$el.html(this.template());
+    this.$el.html(this.template({term: this.term}));
     return this;
   },
 
@@ -148,13 +149,17 @@ AnyGood.AddMovieSuccessView = Backbone.View.extend({
 AnyGood.NoSearchResultView = Backbone.View.extend({
   template: _.template($('#no-search-result-template').html()),
 
-  initialize: function() {
+  initialize: function(options) {
     _.bindAll(this, 'render');
+    this.term = options.term;
   },
 
   render: function() {
     this.$el.html(this.template());
-    this.addMovieView = new AnyGood.AddMovieView({ el: this.$('.add-to-index-form') });
+    this.addMovieView = new AnyGood.AddMovieView({
+      el: this.$('.add-to-index-form'),
+      term: this.term
+    });
     this.addMovieView.render();
     return this;
   },
@@ -163,14 +168,18 @@ AnyGood.NoSearchResultView = Backbone.View.extend({
 AnyGood.SearchResultView = Backbone.View.extend({
   template: _.template($('#search-result-template').html()),
 
-  initialize: function() {
+  initialize: function(options) {
     _.bindAll(this, 'render');
+    this.term = options.term;
     this.model.on('change', this.render);
   },
 
   render: function() {
     this.$el.html(this.template(this.model.toJSON()));
-    this.addMovieView = new AnyGood.AddMovieView({ el: this.$('.add-to-index-form') });
+    this.addMovieView = new AnyGood.AddMovieView({
+      el: this.$('.add-to-index-form'),
+      term: this.term
+    });
     this.addMovieView.render();
     return this;
   },
@@ -249,9 +258,12 @@ AnyGood.MainView = Backbone.View.extend({
       success: function(data) {
         if (data.movies.length > 0) {
           var searchResult = new AnyGood.SearchResult({movies: data.movies});
-          var view         = new AnyGood.SearchResultView({model: searchResult});
+          var view = new AnyGood.SearchResultView({
+            model: searchResult,
+            term: term
+          });
         } else {
-          var view = new AnyGood.NoSearchResultView({});
+          var view = new AnyGood.NoSearchResultView({term: term});
         }
         $("#content").html(view.render().el);
       },
